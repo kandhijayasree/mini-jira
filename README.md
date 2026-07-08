@@ -197,45 +197,37 @@ using **Live Server**.
 
 ![Login](screenshots/login.png)
 
-
 ## Register Page
 
-![Register](screenshots/register.png)
-
+![Register](screenshots/Register.png)
 
 ## Dashboard
 
-![Dashboard](screenshots/dashboard.png)
-
+![Dashboard](screenshots/Dashboard.1.png)
 
 ## Projects
 
-![Projects](screenshots/projects.png)
-
+![Projects](screenshots/Project.png)
 
 ## Tasks
 
-![Tasks](screenshots/tasks.png)
-
+![Tasks](screenshots/Task.1.png)
 
 ## Kanban Board
 
-![Kanban](screenshots/kanban.png)
-
+![Kanban](screenshots/Kanban1.png)
 
 ## Calendar
 
-![Calendar](screenshots/calendar.png)
-
+![Calendar](screenshots/Calender.png)
 
 ## Reports
 
-![Reports](screenshots/reports.png)
-
+![Reports](screenshots/Report.png)
 
 ## Profile
 
-![Profile](screenshots/profile.png)
+![Profile](screenshots/Profile1.png)
 
 
 

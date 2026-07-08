@@ -191,19 +191,51 @@ frontend/login.html
 using **Live Server**.
 
 
+# Screenshots
 
-#  Screenshots
+## Login Page
 
-Add screenshots here:
+![Login](screenshots/login.png)
 
-- Login
-- Dashboard
-- Projects
-- Tasks
-- Kanban
-- Calendar
-- Reports
-- Profile
+
+## Register Page
+
+![Register](screenshots/register.png)
+
+
+## Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+
+## Projects
+
+![Projects](screenshots/projects.png)
+
+
+## Tasks
+
+![Tasks](screenshots/tasks.png)
+
+
+## Kanban Board
+
+![Kanban](screenshots/kanban.png)
+
+
+## Calendar
+
+![Calendar](screenshots/calendar.png)
+
+
+## Reports
+
+![Reports](screenshots/reports.png)
+
+
+## Profile
+
+![Profile](screenshots/profile.png)
 
 
 

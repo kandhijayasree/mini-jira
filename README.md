@@ -204,6 +204,7 @@ using **Live Server**.
 ## Dashboard
 
 ![Dashboard](screenshots/Dashboard.1.png)
+![Dashboard](screenshots/Dashboard.2.png)
 
 ## Projects
 
@@ -212,11 +213,12 @@ using **Live Server**.
 ## Tasks
 
 ![Tasks](screenshots/Task.1.png)
+![Tasks](screenshots/Task.2.png)
 
 ## Kanban Board
 
 ![Kanban](screenshots/Kanban1.png)
-
+![Tasks](screenshots/Kanban2.png)
 ## Calendar
 
 ![Calendar](screenshots/Calender.png)
@@ -228,7 +230,7 @@ using **Live Server**.
 ## Profile
 
 ![Profile](screenshots/Profile1.png)
-
+![Profile](screenshots/Profile2.png)
 
 
 #  Future Improvements

@@ -192,6 +192,10 @@ using **Live Server**.
 
 
 # Screenshots
+## Home Page
+
+![Home](screenshots/Home1.png)
+![Home](screenshots/Home2.png)
 
 ## Login Page
 

@@ -1,17 +1,34 @@
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
 
-
 if(!token || !userId){
     alert("Please Login First");
     window.location.href = "../login.html";
 }
 
-
 const API =
 `http://localhost:3000/projects-with-task-count?userId=${userId}`;
 
-/* Popup */
+/* NOTIFICATIONS */
+
+function addNotification(title, date){
+
+    let notifications =
+    JSON.parse(localStorage.getItem("notifications")) || [];
+
+    notifications.unshift({
+        title:title,
+        date:date || "",
+        createdAt:new Date().toLocaleString()
+    });
+
+    localStorage.setItem(
+        "notifications",
+        JSON.stringify(notifications)
+    );
+}
+
+/* MODAL */
 
 function openProjectModal(){
 
@@ -33,7 +50,7 @@ function closeProjectModal(){
     "none";
 }
 
-/* Load Projects */
+/* LOAD PROJECTS */
 
 async function loadProjects(){
 
@@ -42,14 +59,12 @@ async function loadProjects(){
         const response =
         await fetch(API,{
             headers:{
-                Authorization: token
+                Authorization:token
             }
         });
 
         const projects =
         await response.json();
-
-        console.log("PROJECTS:", projects);
 
         updateProjectStats(projects);
 
@@ -69,6 +84,19 @@ async function loadProjects(){
         document.getElementById("projectTable");
 
         table.innerHTML = "";
+
+        if(filteredProjects.length === 0){
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align:center;">
+                        No projects found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
 
         filteredProjects.forEach((project,index) => {
 
@@ -96,55 +124,54 @@ async function loadProjects(){
             }
 
             table.innerHTML += `
-            <tr>
-                <td>${index + 1}</td>
+                <tr>
+                    <td>${index + 1}</td>
 
-                <td>
-                    <b>${project.projectName}</b>
-                </td>
+                    <td>
+                        <b>${project.projectName || "-"}</b>
+                    </td>
 
-                <td>
-                    ${project.description || "-"}
-                </td>
+                    <td>
+                        ${project.description || "-"}
+                    </td>
 
-                <td>
-                    <span class="status-${project.status}">
-                        ${project.status}
-                    </span>
-                </td>
+                    <td>
+                        <span class="status-${project.status}">
+                            ${project.status || "Active"}
+                        </span>
+                    </td>
 
-                <td>
-                    ${project.startDate || "-"}
-                </td>
+                    <td>
+                        ${project.startDate || "-"}
+                    </td>
 
-                <td>
-                    ${project.endDate || "-"}
-                </td>
+                    <td>
+                        ${project.endDate || "-"}
+                    </td>
 
-                <td>
-                    ${project.taskCount || 0}
-                </td>
+                    <td>
+                        ${project.taskCount || 0}
+                    </td>
 
-                <td>
-                   <button
-class="view-btn"
-onclick="viewProjectTasks('${project._id}')">
-View
-</button>
+                    <td>
+                        <button class="view-btn"
+                        onclick="viewProjectTasks('${project._id}')">
+                            View
+                        </button>
 
-                    <button class="edit-btn"
-                    onclick="editProject('${project._id}')">
-                        Edit
-                    </button>
+                        <button class="edit-btn"
+                        onclick="editProject('${project._id}')">
+                            Edit
+                        </button>
 
-                    ${archiveButton}
+                        ${archiveButton}
 
-                    <button class="delete-btn"
-                    onclick="deleteProject('${project._id}')">
-                        Delete
-                    </button>
-                </td>
-            </tr>
+                        <button class="delete-btn"
+                        onclick="deleteProject('${project._id}')">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
             `;
         });
 
@@ -153,19 +180,8 @@ View
         console.log(error);
     }
 }
-function viewProjectTasks(projectId){
 
-    localStorage.setItem(
-        "selectedProject",
-        projectId
-    );
-
-    window.location.href =
-    "../task/task.html";
-
-}
-
-/* Stats */
+/* STATS */
 
 function updateProjectStats(projects){
 
@@ -188,7 +204,7 @@ function updateProjectStats(projects){
     ).length;
 }
 
-/* Save Project */
+/* SAVE PROJECT */
 
 async function saveProject(){
 
@@ -209,11 +225,21 @@ async function saveProject(){
 
     const status =
     document.getElementById("status").value;
+if(projectName === ""){
+    showProjectError("Please fill the Project Name field");
+    return;
+}
+function showProjectError(message){
 
-    if(projectName === ""){
-        alert("Project Name Required");
-        return;
-    }
+    const error = document.getElementById("projectError");
+
+    error.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation"></i>
+        ${message}
+    `;
+
+    error.style.display = "block";
+}
 
     const projectData = {
         userId,
@@ -228,36 +254,54 @@ async function saveProject(){
 
         if(id){
 
+            const response =
             await fetch(
                 `http://localhost:3000/projects/${id}`,
                 {
                     method:"PUT",
                     headers:{
                         "Content-Type":"application/json",
-                        Authorization: token
+                        Authorization:token
                     },
                     body:JSON.stringify(projectData)
                 }
             );
 
-            alert("Project Updated");
+            if(response.ok){
+
+                addNotification(
+                    "Project Updated : " + projectName,
+                    endDate
+                );
+showToast("Project Updated Successfully");
+            }
 
         }
         else{
 
+            const response =
             await fetch(
                 "http://localhost:3000/projects",
                 {
                     method:"POST",
                     headers:{
                         "Content-Type":"application/json",
-                        Authorization: token
+                        Authorization:token
                     },
                     body:JSON.stringify(projectData)
                 }
             );
 
-            alert("Project Added");
+            if(response.ok){
+
+                addNotification(
+                    "New Project Created : " + projectName,
+                    endDate
+                );
+
+               showToast("Project created Successfully");
+            }
+
         }
 
         closeProjectModal();
@@ -270,7 +314,7 @@ async function saveProject(){
     }
 }
 
-/* Edit Project */
+/* EDIT PROJECT */
 
 async function editProject(id){
 
@@ -279,7 +323,7 @@ async function editProject(id){
         const response =
         await fetch(API,{
             headers:{
-                Authorization: token
+                Authorization:token
             }
         });
 
@@ -327,131 +371,170 @@ async function editProject(id){
     }
 }
 
-/* Delete Project */
+/* DELETE PROJECT */
 
-async function deleteProject(id){
+function deleteProject(id){
 
-    const answer =
-    confirm("Delete Project?");
+    openConfirmModal(
 
-    if(!answer){
-        return;
-    }
+        "Delete this project?",
 
-    try{
+        "Delete",
 
-        await fetch(
-            `http://localhost:3000/projects/${id}`,
-            {
-                method:"DELETE",
-                headers:{
-                    Authorization: token
+        async function(){
+
+            try{
+
+                const response =
+                await fetch(
+                    `http://localhost:3000/projects/${id}`,
+                    {
+                        method:"DELETE",
+                        headers:{
+                            Authorization:token
+                        }
+                    }
+                );
+
+                if(response.ok){
+
+                    showToast("Project Deleted Successfully");
+
+                    addNotification(
+                        "Project Deleted",
+                        new Date().toLocaleDateString()
+                    );
+
+                    loadProjects();
+
                 }
+
             }
-        );
+            catch(error){
 
-        loadProjects();
+                console.log(error);
 
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-
-/* Archive Project */
-
-async function archiveProject(id){
-
-    const answer =
-    confirm("Archive Project?");
-
-    if(!answer){
-        return;
-    }
-
-    try{
-
-        await fetch(
-            `http://localhost:3000/projects/${id}`,
-            {
-                method:"PUT",
-                headers:{
-                    "Content-Type":"application/json",
-                    Authorization: token
-                },
-                body:JSON.stringify({
-                    status:"Archived"
-                })
             }
-        );
 
-        alert("Project Archived");
+        }
 
-        loadProjects();
-
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-
-/* Unarchive Project */
-
-async function unarchiveProject(id){
-
-    const answer =
-    confirm("Unarchive Project?");
-
-    if(!answer){
-        return;
-    }
-
-    try{
-
-        await fetch(
-            `http://localhost:3000/projects/${id}`,
-            {
-                method:"PUT",
-                headers:{
-                    "Content-Type":"application/json",
-                    Authorization: token
-                },
-                body:JSON.stringify({
-                    status:"Active"
-                })
-            }
-        );
-
-        alert("Project Unarchived");
-
-        loadProjects();
-
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-
-/* View Tasks */
-
-function viewTasks(projectId){
-
-    localStorage.setItem(
-        "selectedProject",
-        projectId
     );
 
-    window.location.href =
-    "../task/task.html";
 }
 
-/* Search Project */
+/* ARCHIVE PROJECT */
+
+function archiveProject(id){
+
+    openConfirmModal(
+        "Archive this project?",
+        "Archive",
+        async function(){
+
+            const response = await fetch(
+                `http://localhost:3000/projects/${id}`,
+                {
+                    method:"PUT",
+                    headers:{
+                        "Content-Type":"application/json",
+                        Authorization:token
+                    },
+                    body:JSON.stringify({
+                        status:"Archived"
+                    })
+                }
+            );
+
+            if(response.ok){
+                showToast("Project Archived Successfully");
+                loadProjects();
+            }
+        }
+    );
+}
+/* UNARCHIVE PROJECT */
+
+function unarchiveProject(id){
+
+    openConfirmModal(
+
+        "Restore this project?",
+
+        "Restore",
+
+        async function(){
+
+            try{
+
+                const response =
+                await fetch(
+                    `http://localhost:3000/projects/${id}`,
+                    {
+                        method:"PUT",
+                        headers:{
+                            "Content-Type":"application/json",
+                            Authorization:token
+                        },
+                        body:JSON.stringify({
+
+                            status:"Active"
+
+                        })
+                    }
+                );
+
+                if(response.ok){
+
+                    showToast("Project Restored Successfully");
+
+                    addNotification(
+                        "Project Restored",
+                        new Date().toLocaleDateString()
+                    );
+
+                    loadProjects();
+
+                }
+
+            }
+            catch(error){
+
+                console.log(error);
+
+            }
+
+        }
+
+    );
+
+}
+
+/* VIEW PROJECT TASKS */
+
+function viewProjectTasks(projectId){
+
+    localStorage.setItem("selectedProject", projectId);
+
+    window.location.href = "../task/task.html";
+}
+
+/* SEARCH PROJECT */
 
 function searchProject(){
 
+    const search1 =
+    document.getElementById("searchProject");
+
+    const search2 =
+    document.getElementById("searchProjectTable");
+
     const input =
-    document.getElementById("searchProject")
-    .value.toLowerCase();
+    (search1 && search1.value
+        ? search1.value
+        : search2 && search2.value
+        ? search2.value
+        : ""
+    ).toLowerCase();
 
     const rows =
     document.querySelectorAll("#projectTable tr");
@@ -467,7 +550,7 @@ function searchProject(){
     });
 }
 
-/* Clear Form */
+/* CLEAR FORM */
 
 function clearForm(){
 
@@ -479,7 +562,7 @@ function clearForm(){
     document.getElementById("status").value = "Active";
 }
 
-/* Close modal by clicking outside */
+/* CLOSE MODAL OUTSIDE */
 
 window.onclick = function(event){
 
@@ -491,4 +574,90 @@ window.onclick = function(event){
     }
 };
 
+/* LOGOUT */
+
+function logout(){
+
+    localStorage.clear();
+
+    window.location.href =
+    "../login.html";
+}
+function showToast(message){
+
+    const toast =
+    document.getElementById("toast");
+
+    if(!toast) return;
+
+    toast.innerText = message;
+
+    toast.classList.add("show");
+
+    setTimeout(function(){
+
+        toast.classList.remove("show");
+
+    },2000);
+
+}
+let confirmCallback = null;
+
+function openConfirmModal(message, buttonText, callback){
+
+    const modal = document.getElementById("confirmModal");
+    const title = document.getElementById("confirmTitle");
+    const btn = document.getElementById("confirmActionBtn");
+
+    title.innerText = message;
+    btn.innerText = buttonText;
+
+    btn.className = "confirm-btn";
+
+    if(buttonText === "Delete"){
+        btn.classList.add("delete-btn");
+    }
+    else if(buttonText === "Archive"){
+        btn.classList.add("archive-btn");
+    }
+    else{
+        btn.classList.add("restore-btn");
+    }
+
+    confirmCallback = callback;
+
+    modal.style.display = "flex";
+}
+
+function closeConfirmModal(){
+
+    document.getElementById("confirmModal").style.display = "none";
+    confirmCallback = null;
+
+}
+
+const confirmBtn = document.getElementById("confirmActionBtn");
+
+if(confirmBtn){
+
+    confirmBtn.onclick = async function(){
+
+        if(confirmCallback){
+            await confirmCallback();
+        }
+
+        closeConfirmModal();
+    };
+
+}
+
+/* LOAD PAGE */
+
 loadProjects();
+function closeConfirmModal(){
+
+    document.getElementById("confirmModal").style.display = "none";
+
+    confirmCallback = null;
+
+}

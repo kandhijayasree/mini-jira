@@ -4,68 +4,79 @@
     <meta charset="UTF-8">
     <title>Mini Jira - Calendar</title>
     <link rel="stylesheet" href="calendar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="calendar-page">
 
-    <div class="sidebar">
-        <h2>🚀 Mini Jira</h2>
+    <aside class="sidebar">
+        <div class="logo">
+            <span>🚀</span>
+            <h2>Mini Jira</h2>
+        </div>
 
-        <a href="../dashboard.html">🏠 Dashboard</a>
-        <a href="../project/project.html">📁 Projects</a>
-        <a href="../task/task.html">✅ Tasks</a>
-        <a href="../kanban/kanban.html">📋 Kanban Board</a>
-        <a class="active">🗓 Calendar</a>
-        <a href="../report/report.html">📊 Reports</a>
-        <a href="../profile/profile.html">👤 Profile</a>
+        <nav class="menu">
+            <a href="../dashboard.html" class="menu-link"><i class="fa-solid fa-house"></i>Dashboard</a>
+            <a href="../project/project.html" class="menu-link"><i class="fa-regular fa-folder"></i>Projects</a>
+            <a href="../task/task.html" class="menu-link"><i class="fa-regular fa-square-check"></i>Tasks</a>
+            <a href="../kanban/kanban.html" class="menu-link"><i class="fa-solid fa-table-columns"></i>Kanban Board</a>
+            <a href="calendar.html" class="menu-link active"><i class="fa-regular fa-calendar"></i>Calendar</a>
+            <a href="../report/report.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i>Reports</a>
+            <a href="../profile/profile.html" class="menu-link"><i class="fa-regular fa-user"></i>Profile</a>
+        </nav>
 
-        <button class="logout-btn" onclick="logout()">↪ Logout</button>
-    </div>
+       
+    </aside>
 
-    <div class="main">
+    <main class="main">
 
-       <div class="topbar">
+        <header class="topbar">
+            <div>
+                <h1>Calendar</h1>
+                <p>View tasks by due dates and schedule.</p>
+            </div>
 
-    <div>
-        <h1>Calendar</h1>
-        <p>View tasks by due dates and schedule.</p>
-    </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchCalendar" placeholder="Search tasks..." onkeyup="searchCalendarTasks()">
+            </div>
+        </header>
 
-
-
-</div>
-
-
-        <div class="calendar-card">
+        <section class="calendar-card">
 
             <div class="calendar-header">
-                <button onclick="previousMonth()">◀</button>
+                <button onclick="prevMonth()">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
                 <h2 id="monthYear">Month Year</h2>
-                <button onclick="nextMonth()">▶</button>
+
+                <button onclick="nextMonth()">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
 
             <div class="weekdays">
-                <div>Sun</div>
-                <div>Mon</div>
-                <div>Tue</div>
-                <div>Wed</div>
-                <div>Thu</div>
-                <div>Fri</div>
-                <div>Sat</div>
+                <span>Sun</span>
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
             </div>
 
-            <div class="calendar-grid" id="calendarGrid"></div>
+            <div id="calendarDays" class="calendar-days"></div>
 
-        </div>
+        </section>
 
-    </div>
+    </main>
 
 </div>
 
 <script src="calendar.js"></script>
-<script src="../logout.js"></script>
 
 </body>
 </html>

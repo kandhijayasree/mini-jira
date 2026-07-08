@@ -2,145 +2,194 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Jira Dashboard</title>
+
     <link rel="stylesheet" href="dashboard.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
 <div class="dashboard">
 
-    <!-- Sidebar -->
-    <div class="sidebar">
+    <aside class="sidebar">
 
-        <h2>🚀 Mini Jira</h2>
+        <div class="logo">
+            <span>🚀</span>
+            <h2>Mini Jira</h2>
+        </div>
 
-        <a class="active">🏠 Dashboard</a>
-        <a href="project/project.html">📁 Projects</a>
-        <a href="task/task.html">✅ Tasks</a>
-        <a href="kanban/kanban.html">📋 Kanban Board</a>
-        <a href="calendar/calendar.html">📅 Calendar</a>
-        <a href="report/report.html">📊 Reports</a>
-        <a href="profile/profile.html">👤 Profile</a>
+        <nav class="menu">
+            <a href="dashboard.html" class="menu-link active">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
 
-        <button class="logout-btn" onclick="logout()">↪ Logout</button>
+            <a href="project/project.html" class="menu-link">
+                <i class="fa-regular fa-folder"></i> Projects
+            </a>
 
-    </div>
+            <a href="task/task.html" class="menu-link">
+                <i class="fa-regular fa-square-check"></i> Tasks
+            </a>
 
-    <!-- Main -->
-    <div class="main">
+            <a href="kanban/kanban.html" class="menu-link">
+                <i class="fa-solid fa-table-columns"></i> Kanban Board
+            </a>
 
-        <!-- Top Bar -->
-        <div class="topbar">
+            <a href="calendar/calendar.html" class="menu-link">
+                <i class="fa-regular fa-calendar"></i> Calendar
+            </a>
 
-            <div>
-                <h1 id="welcome">Welcome, User 👋</h1>
+            <a href="report/report.html" class="menu-link">
+                <i class="fa-solid fa-chart-simple"></i> Reports
+            </a>
+
+            <a href="profile/profile.html" class="menu-link">
+                <i class="fa-regular fa-user"></i> Profile
+            </a>
+        </nav>
+
+        
+
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="welcome-block">
+                <h1 id="welcome">Welcome, User</h1>
                 <p>Here's what's happening with your projects today.</p>
             </div>
-             <div class="top-actions">
-            
-            <div class="notification-wrapper">
 
-    <button class="bell-btn" onclick="toggleNotifications()">
-        🔔
-        <span id="notificationCount">0</span>
-    </button>
+            <div class="top-actions">
 
-    <div id="notificationPanel" class="notification-panel">
-        <h3>Notifications</h3>
-        <div id="notificationList"></div>
-    </div>
+                <div class="notification-wrapper">
+                    <button class="bell-btn" onclick="toggleNotifications()">
+                        <i class="fa-regular fa-bell"></i>
+                        <span id="notificationCount">0</span>
+                    </button>
 
-</div>
+                    <div id="notificationPanel" class="notification-panel">
+                        <h3>Notifications</h3>
+                        <div id="notificationList"></div>
+                    </div>
+                </div>
 
-            <div class="search-box">
-                🔍
-                <input type="text" placeholder="Search tasks, projects...">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search tasks, projects...">
+                </div>
+
+                <div class="profile-menu">
+
+                    <div class="profile-dot">I</div>
+
+                    <button class="profile-arrow" onclick="toggleProfileMenu()">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                    <div id="profileDropdown" class="profile-dropdown">
+                        <h4>Indumati</h4>
+                        <p>Administrator</p>
+
+                        <hr>
+
+                        <a href="profile/profile.html">
+                            <i class="fa-regular fa-user"></i> Profile
+                        </a>
+
+                        <a href="dashboard.html">
+                            <i class="fa-solid fa-house"></i> Dashboard
+                        </a>
+  <a href="#" class="dropdown-item logout-item" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+    </a>
+                      
+                    </div>
+
+                </div>
+
             </div>
 
-        </div>
-</div>
-        <!-- Cards -->
-        <div class="cards">
+        </header>
 
-            <div class="card purple">
-                <div class="icon">TP</div>
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">TP</div>
                 <div>
-                     <p>Total Projects</p>
+                    <p>Total Projects</p>
                     <h2 id="totalProjects">0</h2>
-                   
-                    <span>+10% from last month</span>
+                    <span>↑ 10% from last month</span>
                 </div>
             </div>
 
-            <div class="card blue">
-                <div class="icon">TT</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-violet">TT</div>
                 <div>
-                      <p>Total Tasks</p>
+                    <p>Total Tasks</p>
                     <h2 id="totalTasks">0</h2>
-                  
-                    <span>+25% from last month</span>
+                    <span>↑ 25% from last month</span>
                 </div>
             </div>
 
-            <div class="card green">
-                <div class="icon">OT</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-green">OP</div>
                 <div>
-                      <p>Open Tasks</p>
+                    <p>Open Tasks</p>
                     <h2 id="openTasks">0</h2>
-                  
-                    <span>+15% from last month</span>
+                    <span>↑ 15% from last month</span>
                 </div>
             </div>
 
-            <div class="card orange">
-                <div class="icon">PT</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-orange">PT</div>
                 <div>
-                     <p>In Progress Tasks</p>
+                    <p>In Progress Tasks</p>
                     <h2 id="progressTasks">0</h2>
-                   
-                    <span>+5% from last month</span>
+                    <span>↑ 5% from last month</span>
                 </div>
             </div>
 
-            <div class="card violet">
-                <div class="icon">CT</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">CT</div>
                 <div>
                     <p>Completed Tasks</p>
                     <h2 id="completedTasks">0</h2>
-                    
-                    <span>+20% from last month</span>
+                    <span>↑ 20% from last month</span>
                 </div>
             </div>
 
-            <div class="card red">
-                <div class="icon">O</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-red">OD</div>
                 <div>
-                      <p>Overdue Tasks</p>
+                    <p>Overdue Tasks</p>
                     <h2 id="overdueTasks">0</h2>
-                  
-                    <span>+0% from last month</span>
+                    <span>↑ 0% from last month</span>
                 </div>
             </div>
 
-        </div>
+        </section>
 
-        <!-- Charts -->
-        <div class="chart-row">
+        <section class="charts-grid">
 
-            <div class="chart-card">
+            <div class="panel chart-panel">
                 <h3>Tasks Overview</h3>
                 <canvas id="taskChart"></canvas>
             </div>
 
-            <div class="chart-card">
+            <div class="panel chart-panel status-panel">
                 <h3>Tasks by Status</h3>
 
-                <div class="status-box">
-                    <div class="donut">
-                        <h2 id="donutTotal">0</h2>
-                        <p>Total</p>
-                    </div>
+                <div class="status-content">
+                    <canvas id="statusChart"></canvas>
 
                     <div class="legend">
                         <p><span class="dot green-dot"></span> Open <b id="legendOpen">0</b></p>
@@ -151,85 +200,60 @@
                 </div>
             </div>
 
-        </div>
-        <div class="dashboard-bottom">
+        </section>
 
-    <div class="card">
+        <section class="lists-grid">
 
-        <h2>Recent Projects</h2>
+            <div class="panel list-panel">
 
-        <div id="recentProjects"></div>
-
-    </div>
-
-    <div class="card">
-
-        <h2>Upcoming Tasks</h2>
-
-        <div id="upcomingTasks"></div>
-
-    </div>
-
-</div>
-
-        <!-- Bottom -->
-        <div class="bottom-row">
-
-            <div class="list-card">
-                <h3>Recent Projects</h3>
-
-                <div class="list-item">
-                    <span>📁</span>
-                    <div>
-                        <h4>Mini Jira</h4>
-                        <p>Project management system</p>
-                    </div>
-                    <small>Active</small>
+                <div class="panel-header">
+                    <h3>Recent Projects</h3>
+                    <a href="project/project.html">View all <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
 
-                <div class="list-item">
-                    <span>📁</span>
-                    <div>
-                        <h4>Dashboard Design</h4>
-                        <p>Modern UI improvements</p>
-                    </div>
-                    <small>Completed</small>
-                </div>
+                <div id="recentProjectsList"></div>
 
             </div>
 
-            <div class="list-card">
-                <h3>Upcoming Tasks</h3>
+            <div class="panel list-panel">
 
-                <div class="list-item">
-                    <span>⭕</span>
-                    <div>
-                        <h4>Login Page Design</h4>
-                        <p>Mini Jira frontend</p>
-                    </div>
-                    <small>Today</small>
+                <div class="panel-header">
+                    <h3>Upcoming Tasks</h3>
+                    <a href="task/task.html">View all <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
 
-                <div class="list-item">
-                    <span>⭕</span>
-                    <div>
-                        <h4>Fix Dashboard UI</h4>
-                        <p>Cards and charts</p>
-                    </div>
-                    <small>Tomorrow</small>
-                </div>
+                <div id="upcomingTasksList"></div>
 
             </div>
 
-        </div>
+        </section>
 
-    </div>
+        <section class="panel calendar-card">
+
+            <div class="calendar-header">
+                <button onclick="prevMonth()">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <h3>Calendar</h3>
+                <h4 id="monthYear"></h4>
+
+                <button onclick="nextMonth()">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="calendar">
+                <div id="calendarDays" class="days"></div>
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="dashboard.js"></script>
-<script src="logout.js"></script>
 
 </body>
 </html>

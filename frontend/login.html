@@ -2,53 +2,170 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Jira Login</title>
+
     <link rel="stylesheet" href="login.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
+
 <body>
 
-<div class="container">
+<div class="login-page">
 
-    <div class="left-section">
-        <span class="star star1">✦</span>
-        <span class="star star2">✦</span>
-        <span class="star star3">✦</span>
-        <span class="star star4">✦</span>
+    <!-- LEFT SIDE -->
+    <div class="left-panel">
 
-        <div class="rocket-box">
-            <h1>Mini Jira</h1>
-            <div class="rocket">🚀</div>
-            <p>Sign in to continue to your account</p>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+
+            <h1>Mini <span>Jira</span></h1>
         </div>
+
+        <div class="badge">
+            <i class="fa-solid fa-star"></i>
+            Smart Project Management
+        </div>
+
+        <h2>
+            Welcome <span>Back!</span>
+        </h2>
+
+        <p class="description">
+            Organize projects, collaborate with your team,
+            manage deadlines and track every task
+            from one beautiful workspace.
+        </p>
+
+        <div class="feature-card">
+            <div class="feature-icon blue">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div>
+                <h3>Projects</h3>
+                <p>Create & Manage Unlimited Projects</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon purple">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div>
+                <h3>Tasks</h3>
+                <p>Assign Priorities & Deadlines</p>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon cyan">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div>
+                <h3>Reports</h3>
+                <p>Track Daily Progress Instantly</p>
+            </div>
+        </div>
+
+        <!-- Center dashboard drawing -->
+        <div class="dashboard-illustration">
+
+            <div class="dash-sidebar">
+                <i class="fa-solid fa-house"></i>
+                <i class="fa-solid fa-folder"></i>
+                <i class="fa-solid fa-list-check"></i>
+                <i class="fa-solid fa-chart-line"></i>
+                <i class="fa-solid fa-calendar"></i>
+            </div>
+
+            <div class="dash-content">
+                <div class="dash-row small"></div>
+                <div class="dash-grid">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <div class="dash-chart">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="dash-line"></div>
+                <div class="dash-line short"></div>
+            </div>
+
+            <div class="percent">
+                75%
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="right-section">
-        <div class="login-box">
+    <!-- RIGHT SIDE -->
+    <div class="right-panel">
 
-            <h1>Login</h1>
-            <p>Enter your credentials</p>
+        <div class="login-form-box">
 
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
+            <h2>Login</h2>
 
-            <div class="forgot">
-                <a href="forgot-password.html">Forgot Password?</a>
-            </div>
+            <p class="login-subtitle">
+                Sign in to continue to your workspace
+            </p>
 
-            <button class="login-btn" onclick="login()">
-                Login
-            </button>
+            <form onsubmit="login(event)">
 
-            <div class="register">
-                Don't have an account?
-                <a href="register.html">Register</a>
-            </div>
+                <label>Email Address</label>
+                <div class="input-box">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+
+                <label>Password</label>
+                <div class="input-box">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <i class=" " onclick="togglePassword()"></i>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox">
+                        Remember Me
+                    </label>
+
+                    <a href="forgot-password.html">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    Login
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <p id="messageBox"></p>
+
+                <p class="register-text">
+                    Don’t have an account?
+                    <a href="register.html">Register</a>
+                </p>
+
+            </form>
 
         </div>
+
     </div>
 
 </div>
 
 <script src="login.js"></script>
+
 </body>
 </html>

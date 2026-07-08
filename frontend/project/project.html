@@ -1,161 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Jira - Projects</title>
 
     <link rel="stylesheet" href="project.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="project-page">
 
-    <div class="sidebar">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-        <h2>🚀 Mini Jira</h2>
+        <div class="logo">
+            <span>🚀</span>
+            <h2>Mini Jira</h2>
+        </div>
 
-        <a href="../dashboard.html">🏠 Dashboard</a>
-        <a class="active">📁 Projects</a>
-        <a href="../task/task.html">✅ Tasks</a>
-        <a href="../kanban/kanban.html">📋 Kanban Board</a>
-        <a href="../calendar/calendar.html">📅 Calendar</a>
-        <a href="../report/report.html">📊 Reports</a>
-        <a href="../profile/profile.html">👤 Profile</a>
+        <nav class="menu">
 
-        <button class="logout-btn" onclick="logout()">
-            ↪ Logout
-        </button>
+            <a href="../dashboard.html" class="menu-link"
+            onclick="localStorage.removeItem('selectedProject')">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
 
-    </div>
+            <a href="project.html" class="menu-link active">
+                <i class="fa-regular fa-folder"></i>
+                <span>Projects</span>
+            </a>
 
-    <div class="main">
+            <a href="../task/task.html" class="menu-link">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Tasks</span>
+            </a>
 
-        <div class="topbar">
+            <a href="../kanban/kanban.html" class="menu-link">
+                <i class="fa-solid fa-table-columns"></i>
+                <span>Kanban Board</span>
+            </a>
+
+            <a href="../calendar/calendar.html" class="menu-link">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Calendar</span>
+            </a>
+
+            <a href="../report/report.html" class="menu-link">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="../profile/profile.html" class="menu-link">
+                <i class="fa-regular fa-user"></i>
+                <span>Profile</span>
+            </a>
+
+        </nav>
+
+      
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
 
             <div>
                 <h1>Projects</h1>
                 <p>Manage and organize your projects efficiently.</p>
             </div>
 
-            <div class="search-top">
-                🔍
-                <input type="text"
-                       placeholder="Search projects...">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    id="searchProject"
+                    placeholder="Search projects..."
+                    onkeyup="searchProject()">
             </div>
 
-        </div>
+        </header>
 
-        <div class="stats-grid">
+        <!-- STATS -->
+        <section class="stats-grid">
 
-            <div class="stat-card purple">
-                <div class="stat-icon">P</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">P</div>
                 <div>
-                     <p>Total Projects</p>
+                    <p>Total Projects</p>
                     <h2 id="totalProjectsCount">0</h2>
-                  
                 </div>
             </div>
 
-            <div class="stat-card green">
-                <div class="stat-icon">A</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-green">A</div>
                 <div>
-                       <p>Active Projects</p>
+                    <p>Active Projects</p>
                     <h2 id="activeProjectsCount">0</h2>
-                 
                 </div>
             </div>
 
-            <div class="stat-card orange">
-                <div class="stat-icon">PP</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-cyan">PP</div>
                 <div>
-                      <p>Planning Projects</p>
+                    <p>Planning Projects</p>
                     <h2 id="planningProjectsCount">0</h2>
-                  
                 </div>
             </div>
 
-            <div class="stat-card red">
-               <div class="stat-icon">C</div>
+            <div class="stat-card">
+                <div class="stat-icon icon-red">C</div>
                 <div>
-                     <p>Completed Projects</p>
+                    <p>Completed Projects</p>
                     <h2 id="completedProjectsCount">0</h2>
-                   
                 </div>
             </div>
 
+        </section>
+
+        <!-- ACTION -->
+        <div class="action-row">
+            <button class="create-project-btn" onclick="openProjectModal()">
+                <i class="fa-solid fa-plus"></i>
+                Create Project
+            </button>
         </div>
 
-        <button class="add-project-btn"
-                onclick="openProjectModal()">
-            + Create Project
-        </button>
-
-        <div class="table-card">
+        <!-- PROJECT TABLE -->
+        <section class="table-card">
 
             <div class="table-header">
 
                 <h2>All Projects</h2>
 
-                <select id="projectFilter"
-                        onchange="loadProjects()">
-
-                    <option value="All" selected>All Status</option>
+                <select id="projectFilter" onchange="loadProjects()">
+                    <option value="All">All Status</option>
                     <option value="Active">Active</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Completed">Completed</option>
                     <option value="Archived">Archived</option>
-
                 </select>
 
             </div>
 
-            <div class="search-box">
+            <div class="table-search">
+                <input
+                    type="text"
+                    id="searchProjectTable"
+                    placeholder="Search Project..."
+                    onkeyup="searchProject()">
+            </div>
 
-                <input type="text"
-                       id="searchProject"
-                       placeholder="Search Project..."
-                       onkeyup="searchProject()">
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Project Name</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Tasks</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="projectTable">
+                        <!-- Dynamic projects will load here -->
+                    </tbody>
+
+                </table>
 
             </div>
 
-            <table>
+        </section>
 
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Project Name</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Tasks</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody id="projectTable">
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
+    </main>
 
 </div>
 
-<!-- Project Popup Modal -->
-
+<!-- PROJECT MODAL -->
 <div id="projectModal" class="modal">
 
     <div class="modal-content">
 
-        <span class="close"
-              onclick="closeProjectModal()">
+        <span class="close-btn" onclick="closeProjectModal()">
             &times;
         </span>
 
@@ -164,30 +204,36 @@
         <input type="hidden" id="projectId">
 
         <label>Project Name</label>
-        <input type="text"
-               id="projectName"
-               placeholder="Enter project name">
+        <input type="text" id="projectName" placeholder="Enter project name">
 
         <label>Description</label>
-        <textarea id="description"
-                  placeholder="Enter project description"></textarea>
+        <textarea id="description" placeholder="Enter project description"></textarea>
 
-        <label>Start Date</label>
-        <input type="date"
-               id="startDate">
+        <div class="form-row">
 
-        <label>End Date</label>
-        <input type="date"
-               id="endDate">
+            <div>
+                <label>Start Date</label>
+                <input type="date" id="startDate">
+            </div>
+
+            <div>
+                <label>End Date</label>
+                <input type="date" id="endDate">
+            </div>
+
+        </div>
 
         <label>Status</label>
         <select id="status">
             <option value="Active">Active</option>
+            <option value="Planning">Planning</option>
+            <option value="Completed">Completed</option>
             <option value="Archived">Archived</option>
         </select>
 
-        <button class="create-btn"
-                onclick="saveProject()">
+        <p id="projectError" class="project-error"></p>
+
+        <button class="create-btn" onclick="saveProject()">
             Save Project
         </button>
 
@@ -195,9 +241,25 @@
 
 </div>
 
+<div id="toast" class="toast"></div>
+
+<div id="confirmModal" class="confirm-modal">
+    <div class="confirm-box">
+        <h3 id="confirmTitle">Delete this project?</h3>
+
+        <div class="confirm-actions">
+            <button class="cancel-btn" onclick="closeConfirmModal()">
+                Cancel
+            </button>
+
+            <button id="confirmActionBtn" class="confirm-btn">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
 <script src="project.js"></script>
-<script src="../logout.js"></script>
 
 </body>
-
 </html>

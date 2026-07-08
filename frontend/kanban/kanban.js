@@ -6,30 +6,28 @@ if(!token || !userId){
     window.location.href = "../login.html";
 }
 
-
-
-const API =
-`http://localhost:3000/tasks?userId=${userId}`;
+const API = `http://localhost:3000/tasks?userId=${userId}`;
 
 let allTasks = [];
 
-/* Load Kanban */
+/* LOAD KANBAN */
 
 async function loadKanban(){
 
     try{
 
-        const response =
-        await fetch(API,{
+        const response = await fetch(API,{
             headers:{
-                Authorization: token
+                Authorization:token
             }
         });
 
-        allTasks =
-        await response.json();
+        const tasks = await response.json();
 
-        displayKanban(allTasks);
+        allTasks = tasks;
+
+        renderKanban(tasks);
+        updateCounts(tasks);
 
     }
     catch(error){
@@ -37,13 +35,17 @@ async function loadKanban(){
     }
 }
 
-/* Display Kanban */
+/* RENDER KANBAN */
 
-function displayKanban(tasks){
+function renderKanban(tasks){
 
-    document.getElementById("openTasks").innerHTML = "";
-    document.getElementById("progressTasks").innerHTML = "";
-    document.getElementById("completedTasks").innerHTML = "";
+    const openBox = document.getElementById("openTasks");
+    const progressBox = document.getElementById("progressTasks");
+    const completedBox = document.getElementById("completedTasks");
+
+    openBox.innerHTML = "";
+    progressBox.innerHTML = "";
+    completedBox.innerHTML = "";
 
     const openTasks =
     tasks.filter(task => task.status === "Open");
@@ -54,84 +56,102 @@ function displayKanban(tasks){
     const completedTasks =
     tasks.filter(task => task.status === "Completed");
 
-    document.getElementById("openCount").innerText =
-    openTasks.length;
-
-    document.getElementById("progressCount").innerText =
-    progressTasks.length;
-
-    document.getElementById("completedCount").innerText =
-    completedTasks.length;
-
     openTasks.forEach(task => {
-        document.getElementById("openTasks").innerHTML +=
-        createTaskCard(task,"open-card");
+        openBox.innerHTML += createTaskCard(task,"open-task");
     });
 
     progressTasks.forEach(task => {
-        document.getElementById("progressTasks").innerHTML +=
-        createTaskCard(task,"progress-card");
+        progressBox.innerHTML += createTaskCard(task,"progress-task");
     });
 
     completedTasks.forEach(task => {
-        document.getElementById("completedTasks").innerHTML +=
-        createTaskCard(task,"completed-card");
+        completedBox.innerHTML += createTaskCard(task,"completed-task");
     });
+
+    if(openTasks.length === 0){
+        openBox.innerHTML = `<p class="empty-msg">No open tasks</p>`;
+    }
+
+    if(progressTasks.length === 0){
+        progressBox.innerHTML = `<p class="empty-msg">No progress tasks</p>`;
+    }
+
+    if(completedTasks.length === 0){
+        completedBox.innerHTML = `<p class="empty-msg">No completed tasks</p>`;
+    }
 }
 
-/* Create Card */
+/* CREATE CARD */
 
-function createTaskCard(task, cardClass){
-
-    let priorityClass = "low";
-
-    if(task.priority === "Medium"){
-        priorityClass = "medium";
-    }
-
-    if(task.priority === "High"){
-        priorityClass = "high";
-    }
+function createTaskCard(task,className){
 
     return `
-    <div class="task-card ${cardClass}">
-        <h3>${task.taskName}</h3>
+        <div class="task-card ${className}">
 
-        <p>${task.description || "No description"}</p>
+            <h3>${task.taskName || "Untitled Task"}</h3>
 
-        <p>
-            <b>Assigned:</b>
-            ${task.assignedTo || "-"}
-        </p>
+            <p>${task.description || "No description"}</p>
 
-        <p>
-            <b>Due:</b>
-            ${task.dueDate || "-"}
-        </p>
+            <small>
+                <strong>Assigned:</strong>
+                ${task.assignedTo || "-"}
+            </small>
 
-        <span class="priority ${priorityClass}">
-            ${task.priority}
-        </span>
-    </div>
+            <small>
+                <strong>Due:</strong>
+                ${task.dueDate || "-"}
+            </small>
+
+            <span class="priority ${task.priority || "Low"}">
+                ${task.priority || "Low"}
+            </span>
+
+        </div>
     `;
 }
 
-/* Search Kanban */
+/* COUNTS */
+
+function updateCounts(tasks){
+
+    const open =
+    tasks.filter(task => task.status === "Open").length;
+
+    const progress =
+    tasks.filter(task => task.status === "In Progress").length;
+
+    const completed =
+    tasks.filter(task => task.status === "Completed").length;
+
+    document.getElementById("openCount").innerText = open;
+    document.getElementById("progressCount").innerText = progress;
+    document.getElementById("completedCount").innerText = completed;
+}
+
+/* SEARCH */
 
 function searchKanban(){
 
-    const input =
-    document.getElementById("searchKanban")
-    .value.toLowerCase();
+    const value =
+    document.getElementById("searchKanban").value.toLowerCase();
 
     const filtered =
-    allTasks.filter(task =>
-        task.taskName.toLowerCase().includes(input) ||
-        task.description.toLowerCase().includes(input) ||
-        task.assignedTo.toLowerCase().includes(input)
-    );
+    allTasks.filter(task => {
 
-    displayKanban(filtered);
+        const text =
+        `${task.taskName} ${task.description} ${task.assignedTo} ${task.priority} ${task.status}`
+        .toLowerCase();
+
+        return text.includes(value);
+
+    });
+
+    renderKanban(filtered);
+    updateCounts(filtered);
 }
+
+
+
+/* INIT */
 
 loadKanban();

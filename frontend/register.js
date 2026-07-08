@@ -1,95 +1,176 @@
-async function registerUser() {
+const API = "http://localhost:3000";
+
+/* ==========================
+   REGISTER
+========================== */
+
+async function register(event){
+
+    event.preventDefault();
 
     const name =
-    document.getElementById("name").value;
+    document.getElementById("name").value.trim();
 
     const email =
-    document.getElementById("email").value;
+    document.getElementById("email").value.trim();
 
     const password =
     document.getElementById("password").value;
 
-    const message =
-    document.getElementById("message");
+    const messageBox =
+    document.getElementById("messageBox");
 
-    message.innerText = "";
+    messageBox.className = "";
+    messageBox.style.display = "none";
 
-    if (
-        name === "" ||
-        email === "" ||
-        password === ""
-    ) {
+    /* Validation */
 
-        message.style.color = "red";
+    if(name === "" || email === "" || password === ""){
 
-        message.innerText =
-        "Please fill all fields";
+        showMessage(
+            "Please fill all fields.",
+            "error"
+        );
 
         return;
     }
 
-    try {
+    if(password.length < 6){
+
+        showMessage(
+            "Password must contain at least 6 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+    try{
 
         const response =
-        await fetch(
-            "http://localhost:3000/register",
-            {
-                method: "POST",
+        await fetch(`${API}/register`,{
 
-                headers: {
-                    "Content-Type":
-                    "application/json"
-                },
+            method:"POST",
 
-                body: JSON.stringify({
+            headers:{
+                "Content-Type":"application/json"
+            },
 
-                    name,
-                    email,
-                    password
+            body:JSON.stringify({
 
-                })
-            }
-        );
+                name,
+                email,
+                password
+
+            })
+
+        });
 
         const data =
         await response.json();
 
-        if(data.success){
+        if(response.ok){
 
-            message.style.color =
-            "green";
+            showMessage(
+                "Registration Successful",
+                "success"
+            );
 
-            message.innerText =
-            "Registration Successful";
-
-            setTimeout(() => {
+            setTimeout(()=>{
 
                 window.location.href =
                 "login.html";
 
-            }, 1500);
+            },1200);
 
         }
         else{
 
-            message.style.color =
-            "red";
+            showMessage(
 
-            message.innerText =
-            data.message;
+                data.message ||
+                "Registration Failed",
+
+                "error"
+
+            );
 
         }
 
     }
+
     catch(error){
 
         console.log(error);
 
-        message.style.color =
-        "red";
+        showMessage(
 
-        message.innerText =
-        "Backend connection failed";
+            "Unable to connect to server.",
+
+            "error"
+
+        );
+
+    }
+
+}
+
+/* ==========================
+   PASSWORD SHOW / HIDE
+========================== */
+
+function togglePassword(){
+
+    const password =
+    document.getElementById("password");
+
+    const eye =
+    document.querySelector(".eye");
+
+    if(password.type === "password"){
+
+        password.type = "text";
+
+        eye.classList.remove("fa-eye");
+
+        eye.classList.add("fa-eye-slash");
+
+    }
+    else{
+
+        password.type = "password";
+
+        eye.classList.remove("fa-eye-slash");
+
+        eye.classList.add("fa-eye");
+
+    }
+
+}
+
+/* ==========================
+   MESSAGE
+========================== */
+
+function showMessage(message,type){
+
+    const box =
+    document.getElementById("messageBox");
+
+    box.innerText = message;
+
+    box.className = type;
+
+    box.style.display = "block";
+
+    if(type === "success"){
+
+        box.style.color = "#22c55e";
+
+    }
+    else{
+
+        box.style.color = "#ef4444";
 
     }
 

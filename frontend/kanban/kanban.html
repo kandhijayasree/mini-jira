@@ -3,100 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <title>Mini Jira - Kanban</title>
+
     <link rel="stylesheet" href="kanban.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="kanban-page">
 
-    <div class="sidebar">
-        <h2>🚀 Mini Jira</h2>
+    <aside class="sidebar">
 
-        <a href="../dashboard.html">🏠 Dashboard</a>
-        <a href="../project/project.html">📁 Projects</a>
-        <a href="../task/task.html">✅ Tasks</a>
-        <a class="active">📋 Kanban Board</a>
-        <a href="../calendar/calendar.html">🗓 Calendar</a>
-        <a href="../report/report.html">📊 Reports</a>
-        <a href="../profile/profile.html">👤 Profile</a>
+        <div class="logo">
+            <span>🚀</span>
+            <h2>Mini Jira</h2>
+        </div>
 
-        <button class="logout-btn" onclick="logout()">↪ Logout</button>
-    </div>
+        <nav class="menu">
+            <a href="../dashboard.html" class="menu-link">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
 
-    <div class="main">
+            <a href="../project/project.html" class="menu-link">
+                <i class="fa-regular fa-folder"></i> Projects
+            </a>
 
-        <div class="topbar">
+            <a href="../task/task.html" class="menu-link">
+                <i class="fa-regular fa-square-check"></i> Tasks
+            </a>
+
+            <a href="kanban.html" class="menu-link active">
+                <i class="fa-solid fa-table-columns"></i> Kanban Board
+            </a>
+
+            <a href="../calendar/calendar.html" class="menu-link">
+                <i class="fa-regular fa-calendar"></i> Calendar
+            </a>
+
+            <a href="../report/report.html" class="menu-link">
+                <i class="fa-solid fa-chart-simple"></i> Reports
+            </a>
+
+            <a href="../profile/profile.html" class="menu-link">
+                <i class="fa-regular fa-user"></i> Profile
+            </a>
+        </nav>
+
+       
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
             <div>
                 <h1>Kanban Board</h1>
                 <p>Track tasks by progress and status.</p>
             </div>
 
-            <div class="search-top">
-                🔍
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="searchKanban" placeholder="Search tasks..." onkeyup="searchKanban()">
             </div>
-        </div>
+        </header>
 
-        <div class="stats-grid">
+        <section class="stats-grid">
 
-            <div class="stat-card blue">
-                <div class="stat-icon">O</div>
+            <div class="stat-card">
+                <div class="stat-icon blue">O</div>
                 <div>
                     <h2 id="openCount">0</h2>
                     <p>Open Tasks</p>
                 </div>
             </div>
 
-            <div class="stat-card orange">
-                <div class="stat-icon">P</div>
+            <div class="stat-card">
+                <div class="stat-icon orange">P</div>
                 <div>
                     <h2 id="progressCount">0</h2>
                     <p>In Progress</p>
                 </div>
             </div>
 
-            <div class="stat-card green">
-                <div class="stat-icon">C</div>
+            <div class="stat-card">
+                <div class="stat-icon green">C</div>
                 <div>
                     <h2 id="completedCount">0</h2>
                     <p>Completed</p>
                 </div>
             </div>
 
-        </div>
+        </section>
 
-        <div class="kanban-board">
+        <section class="kanban-board">
 
-            <div class="kanban-column">
-                <div class="column-header open-header">
-                    <h2>Open</h2>
-                </div>
-                <div id="openTasks"></div>
+            <div class="kanban-column open-column">
+                <h2>Open</h2>
+                <div id="openTasks" class="task-list"></div>
             </div>
 
-            <div class="kanban-column">
-                <div class="column-header progress-header">
-                    <h2>In Progress</h2>
-                </div>
-                <div id="progressTasks"></div>
+            <div class="kanban-column progress-column">
+                <h2>In Progress</h2>
+                <div id="progressTasks" class="task-list"></div>
             </div>
 
-            <div class="kanban-column">
-                <div class="column-header completed-header">
-                    <h2>Completed</h2>
-                </div>
-                <div id="completedTasks"></div>
+            <div class="kanban-column completed-column">
+                <h2>Completed</h2>
+                <div id="completedTasks" class="task-list"></div>
             </div>
 
-        </div>
+        </section>
 
-    </div>
+    </main>
 
 </div>
 
 <script src="kanban.js"></script>
-<script src="../logout.js"></script>
 
 </body>
 </html>

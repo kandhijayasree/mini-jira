@@ -1,133 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Mini Jira - Profile</title>
     <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="profile-page">
 
-    <div class="sidebar">
-
-        <h2>🚀 Mini Jira</h2>
-
-        <a href="../dashboard.html">🏠 Dashboard</a>
-        <a href="../project/project.html">📁 Projects</a>
-        <a href="../task/task.html">✅ Tasks</a>
-        <a href="../kanban/kanban.html">📋 Kanban Board</a>
-        <a href="../calendar/calendar.html">🗓 Calendar</a>
-        <a href="../report/report.html">📊 Reports</a>
-        <a class="active">👤 Profile</a>
-
-        <button class="logout-btn" onclick="logout()">
-            ↪ Logout
-        </button>
-
-    </div>
-
-    <div class="main">
-
-        <div class="topbar">
-            <div>
-                <h1>My Profile</h1>
-                <p>Manage your account information and password.</p>
-            </div>
+    <aside class="sidebar">
+        <div class="logo">
+            <span>🚀</span>
+            <h2>Mini Jira</h2>
         </div>
 
-        <div class="profile-card">
+        <nav class="menu">
+            <a href="../dashboard.html" class="menu-link"><i class="fa-solid fa-house"></i>Dashboard</a>
+            <a href="../project/project.html" class="menu-link"><i class="fa-regular fa-folder"></i>Projects</a>
+            <a href="../task/task.html" class="menu-link"><i class="fa-regular fa-square-check"></i>Tasks</a>
+            <a href="../kanban/kanban.html" class="menu-link"><i class="fa-solid fa-table-columns"></i>Kanban Board</a>
+            <a href="../calendar/calendar.html" class="menu-link"><i class="fa-regular fa-calendar"></i>Calendar</a>
+            <a href="../report/report.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i>Reports</a>
+            <a href="profile.html" class="menu-link active"><i class="fa-regular fa-user"></i>Profile</a>
+        </nav>
+
+       
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <h1>My Profile</h1>
+            <p>Manage your account information and password.</p>
+        </header>
+
+        <section class="profile-card">
 
             <div class="avatar">
-                👤
+                <i class="fa-solid fa-user"></i>
             </div>
 
-            <div class="profile-info">
+            <div>
                 <h2 id="userName">User</h2>
                 <p id="userEmail">user@gmail.com</p>
                 <span>Project Management User</span>
 
                 <div class="profile-stats">
-                    <p>Total Projects: <b id="profileProjects">0</b></p>
-                    <p>Total Tasks: <b id="profileTasks">0</b></p>
+                    <b>Total Projects: <span id="totalProjects">0</span></b>
+                    <b>Total Tasks: <span id="totalTasks">0</span></b>
                 </div>
             </div>
 
-        </div>
+        </section>
 
-        <div class="grid">
+        <section class="forms-grid">
 
             <div class="form-card">
-
                 <h2>Update Profile</h2>
 
                 <label>Name</label>
                 <input type="text" id="name" placeholder="Enter name">
 
                 <label>Email</label>
-                <input type="email" id="email" placeholder="Enter email">
+                <input type="email" id="email" readonly>
 
                 <button onclick="updateProfile()">
                     Update Profile
                 </button>
-
             </div>
 
             <div class="form-card">
-
                 <h2>Change Password</h2>
 
                 <label>Current Password</label>
-                <input type="password" id="oldPassword" placeholder="Current Password">
+                <input type="password" id="currentPassword" placeholder="Current Password">
 
                 <label>New Password</label>
                 <input type="password" id="newPassword" placeholder="New Password">
 
                 <label>Confirm Password</label>
                 <input type="password" id="confirmPassword" placeholder="Confirm Password">
-
+<p id="passwordError" class="form-error"></p>
                 <button onclick="changePassword()">
                     Change Password
                 </button>
-
             </div>
 
-        </div>
+        </section>
 
-        <div class="account-card">
-
+        <section class="info-card">
             <h2>Account Information</h2>
 
-            <div class="account-grid">
-
-                <div>
-                    <span>User Role</span>
-                    <h3>Admin</h3>
-                </div>
-
-                <div>
-                    <span>Total Projects</span>
-                    <h3 id="accountProjects">0</h3>
-                </div>
-
-                <div>
-                    <span>Total Tasks</span>
-                    <h3 id="accountTasks">0</h3>
-                </div>
-
+            <div class="info-row">
+                <span>User ID</span>
+                <b id="infoUserId">-</b>
             </div>
 
-        </div>
+            <div class="info-row">
+                <span>Email</span>
+                <b id="infoEmail">-</b>
+            </div>
 
-    </div>
+            <div class="info-row">
+                <span>Account Type</span>
+                <b>Mini Jira User</b>
+            </div>
+        </section>
+
+    </main>
 
 </div>
 
 <script src="profile.js"></script>
-<script src="../logout.js"></script>
 
 </body>
-
 </html>

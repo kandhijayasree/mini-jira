@@ -1,8 +1,6 @@
-const API = "http://localhost:3000";
+async function login(event){
 
-/* Login */
-
-async function login(){
+    event.preventDefault();
 
     const email =
     document.getElementById("email").value.trim();
@@ -10,29 +8,23 @@ async function login(){
     const password =
     document.getElementById("password").value.trim();
 
-    if(email === "" || password === ""){
+    const messageBox =
+    document.getElementById("messageBox");
 
-        alert("Please fill all fields");
-        return;
-
-    }
+    messageBox.innerText = "";
 
     try{
 
         const response =
-        await fetch(`${API}/login`,{
-
+        await fetch("http://localhost:3000/login",{
             method:"POST",
-
             headers:{
                 "Content-Type":"application/json"
             },
-
             body:JSON.stringify({
                 email,
                 password
             })
-
         });
 
         const data =
@@ -42,7 +34,7 @@ async function login(){
 
             localStorage.setItem(
                 "token",
-                data.token
+                data.token || "mini-jira-token"
             );
 
             localStorage.setItem(
@@ -60,18 +52,19 @@ async function login(){
                 data.user.email
             );
 
-            alert("Login Successful");
+            messageBox.style.color = "#22c55e";
+            messageBox.innerText = "Login successful";
 
-            window.location.href =
-            "dashboard.html";
+            setTimeout(function(){
+                window.location.href = "dashboard.html";
+            },700);
 
         }
         else{
 
-            alert(
-                data.message ||
-                "Invalid Email or Password"
-            );
+            messageBox.style.color = "#fb7185";
+            messageBox.innerText =
+            data.message || "Invalid email or password";
 
         }
 
@@ -80,25 +73,33 @@ async function login(){
 
         console.log(error);
 
-        alert(
-            "Cannot connect to backend server"
-        );
+        messageBox.style.color = "#fb7185";
+        messageBox.innerText =
+        "Unable to connect to server";
 
     }
 
 }
 
-/* Enter Key Support */
+function togglePassword(){
 
-document.addEventListener(
-    "keypress",
-    function(event){
+    const password =
+    document.getElementById("password");
 
-        if(event.key === "Enter"){
+    const eye =
+    document.querySelector(".eye");
 
-            login();
+    if(password.type === "password"){
 
-        }
+        password.type = "text";
+
+        
 
     }
-);
+    else{
+
+        password.type = "password";
+
+    }
+
+}

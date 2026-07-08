@@ -1,139 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Mini Jira - Tasks</title>
-    <link rel="stylesheet" href="task.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Jira - Tasks</title>
+<link rel="stylesheet" href="task.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="task-page">
 
-    <div class="sidebar">
-        <h2>🚀 Mini Jira</h2>
+<aside class="sidebar">
+    <div class="logo"><span>🚀</span><h2>Mini Jira</h2></div>
 
-        <a href="../dashboard.html">🏠 Dashboard</a>
-        <a href="../project/project.html">📁 Projects</a>
-        <a class="active">✅ Tasks</a>
-        <a href="../kanban/kanban.html">📋 Kanban Board</a>
-        <a href="../calendar/calendar.html">🗓 Calendar</a>
-        <a href="../report/report.html">📊 Reports</a>
-        <a href="../profile/profile.html">👤 Profile</a>
+    <nav class="menu">
+        <a href="../dashboard.html" class="menu-link"><i class="fa-solid fa-house"></i>Dashboard</a>
+        <a href="../project/project.html" class="menu-link"><i class="fa-regular fa-folder"></i>Projects</a>
+        <a href="task.html" class="menu-link active"><i class="fa-regular fa-square-check"></i>Tasks</a>
+        <a href="../kanban/kanban.html" class="menu-link"><i class="fa-solid fa-table-columns"></i>Kanban Board</a>
+        <a href="../calendar/calendar.html" class="menu-link"><i class="fa-regular fa-calendar"></i>Calendar</a>
+        <a href="../report/report.html" class="menu-link"><i class="fa-solid fa-chart-simple"></i>Reports</a>
+        <a href="../profile/profile.html" class="menu-link"><i class="fa-regular fa-user"></i>Profile</a>
+    </nav>
 
-        <button class="logout-btn" onclick="logout()">↪ Logout</button>
+    
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+    <div>
+        <h1>Tasks</h1>
+        <p>Manage and organize your tasks efficiently.</p>
     </div>
 
-    <div class="main">
+    <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchTask" placeholder="Search tasks..." onkeyup="searchTask()">
+    </div>
+</header>
 
-        <div class="topbar">
-            <div>
-                <h1>Tasks</h1>
-                <p>Manage and organize your tasks efficiently.</p>
-            </div>
+<section class="stats-grid">
+    <div class="stat-card"><div class="stat-icon icon-violet">T</div><div><h2 id="totalTasksCount">0</h2><p>Total Tasks</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-green">O</div><div><h2 id="openTasksCount">0</h2><p>Open Tasks</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-orange">P</div><div><h2 id="progressTasksCount">0</h2><p>Progress Tasks</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-red">C</div><div><h2 id="completedTasksCount">0</h2><p>Completed Tasks</p></div></div>
+</section>
 
-            <div class="search-top">
-                🔍
-                <input type="text" placeholder="Search tasks...">
-            </div>
-        </div>
+<button class="create-task-btn" onclick="openTaskModal()">
+    <i class="fa-solid fa-plus"></i> Create Task
+</button>
 
-        <div class="stats-grid">
+<section class="table-card">
+    <div class="table-header">
+        <h2>All Tasks</h2>
 
-            <div class="stat-card purple">
-                <div class="stat-icon">T</div>
-                <div>
-                    <h2 id="totalTasksCount">0</h2>
-                    <p>Total Tasks</p>
-                </div>
-            </div>
-
-            <div class="stat-card green">
-                <div class="stat-icon">O</div>
-                <div>
-                    <h2 id="openTasksCount">0</h2>
-                    <p>Open Tasks</p>
-                </div>
-            </div>
-
-            <div class="stat-card orange">
-                <div class="stat-icon">P</div>
-                <div>
-                    <h2 id="progressTasksCount">0</h2>
-                    <p>Progress Tasks</p>
-                </div>
-            </div>
-
-            <div class="stat-card red">
-                <div class="stat-icon">C</div>
-                <div>
-                    <h2 id="completedTasksCount">0</h2>
-                    <p>Completed Tasks</p>
-                </div>
-            </div>
-
-        </div>
-
-        <button class="add-task-btn" onclick="openTaskModal()">
-            + Create Task
-        </button>
-
-        <div class="table-card">
-
-            <div class="table-header">
-                <h2>All Tasks</h2>
-
-                <select id="taskFilter" onchange="loadTasks()">
-                    <option value="All">All Status</option>
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Overdue">Overdue</option>
-                </select>
-            </div>
-
-            <div class="search-box">
-                <input type="text" id="searchTask" placeholder="Search Task..." onkeyup="searchTask()">
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Task</th>
-                        <th>Description</th>
-                        <th>Assigned To</th>
-                        <th>Due Date</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Attachments</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody id="taskTable"></tbody>
-            </table>
-
-        </div>
-
+        <select id="taskFilter" onchange="loadTasks()">
+            <option value="All">All Status</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Overdue">Overdue</option>
+        </select>
     </div>
 
+    <div class="table-search">
+        <input type="text" placeholder="Search Task..." onkeyup="searchTask()">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Task</th>
+                    <th>Description</th>
+                    <th>Assigned To</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Attachments</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="taskTable"></tbody>
+        </table>
+    </div>
+</section>
+
+</main>
 </div>
 
+<!-- Task Modal -->
 <div id="taskModal" class="modal">
-
     <div class="modal-content">
-
-        <span class="close" onclick="closeTaskModal()">&times;</span>
-
+        <span class="close-btn" onclick="closeTaskModal()">&times;</span>
         <h2 id="modalTitle">Create New Task</h2>
 
         <input type="hidden" id="taskId">
 
         <label>Project</label>
-        <select id="projectId">
-            <option value="">Select Project</option>
-        </select>
+        <select id="projectId"></select>
 
         <label>Task Name</label>
         <input type="text" id="taskName" placeholder="Enter task name">
@@ -142,100 +111,91 @@
         <textarea id="description" placeholder="Enter task description"></textarea>
 
         <label>Assigned To</label>
-        <input type="text" id="assignedTo" placeholder="Assigned To">
+        <input type="text" id="assignedTo" placeholder="Assigned user">
 
-        <label>Due Date</label>
-        <input type="date" id="dueDate">
+        <div class="form-row">
+            <div>
+                <label>Due Date</label>
+                <input type="date" id="dueDate">
+            </div>
 
-        <label>Priority</label>
-        <select id="priority">
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
-        </select>
+            <div>
+                <label>Priority</label>
+                <select id="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+        </div>
 
         <label>Status</label>
         <select id="status">
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Completed</option>
-            <option>Overdue</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Overdue">Overdue</option>
         </select>
-
-        <button class="save-btn" onclick="saveTask()">
-            Save Task
-        </button>
-
+<p id="formError" class="form-error"></p>
+        <button class="save-btn" onclick="saveTask()">Save Task</button>
     </div>
-
 </div>
 
-<script src="task.js"></script>
-<script src="../logout.js"></script>
-<div id="commentModal" class="comment-modal">
-
-    <div class="comment-box">
-
-        <span class="close" onclick="closeCommentModal()">
-            &times;
-        </span>
-
+<!-- Comment Modal -->
+<div id="commentModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeCommentModal()">&times;</span>
         <h2>Task Comments</h2>
 
         <input type="hidden" id="commentTaskId">
+        <textarea id="commentText" placeholder="Write a comment..."></textarea>
 
-        <div id="commentsList"></div>
+        <button class="save-btn" onclick="addComment()">Add Comment</button>
 
-        <textarea id="commentText"
-                  placeholder="Write a comment..."></textarea>
-
-        <button onclick="addComment()">
-            Send Comment
-        </button>
-
+        <div id="commentsList" class="comments-list"></div>
     </div>
-
 </div>
-<div id="attachModal" class="comment-modal">
 
-    <div class="comment-box">
-
-        <span class="close" onclick="closeAttachModal()">
-            &times;
-        </span>
-
-        <h2>Attach File</h2>
+<!-- Attachment Modal -->
+<div id="attachModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAttachModal()">&times;</span>
+        <h2>Upload Attachment</h2>
 
         <input type="hidden" id="attachTaskId">
-
         <input type="file" id="taskFile">
 
-        <button onclick="uploadAttachment()">
-            Upload File
-        </button>
-
+        <button class="save-btn" onclick="uploadAttachment()">Upload File</button>
     </div>
-
 </div>
+
 <!-- Attachment Viewer -->
-
-<div id="attachmentViewer" class="comment-modal">
-
-    <div class="comment-box">
-
-        <span class="close"
-        onclick="closeAttachmentViewer()">
-            &times;
-        </span>
-
-        <h2>Task Attachments</h2>
-
-        <div id="attachmentList">
-
-        </div>
-
+<div id="attachmentViewer" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAttachmentViewer()">&times;</span>
+        <h2>Attachments</h2>
+        <div id="attachmentList"></div>
     </div>
-
 </div>
+<div id="taskDeleteModal" class="confirm-modal">
+    <div class="confirm-box">
+        <h3>Delete this task?</h3>
+
+        <div class="confirm-actions">
+            <button class="cancel-btn" onclick="closeTaskDeleteModal()">
+                Cancel
+            </button>
+
+            <button id="taskDeleteBtn" class="confirm-btn delete-btn">
+                Delete
+            </button>
+            
+        </div>
+    </div>
+</div>
+
+
+<script src="task.js"></script>
+<div id="toast" class="toast"></div>
 </body>
 </html>

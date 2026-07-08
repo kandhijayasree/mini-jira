@@ -1,102 +1,79 @@
-async function updatePassword(){
+const API = "http://localhost:3000";
+
+async function resetPassword(event){
+
+    event.preventDefault();
 
     const email =
-    document.getElementById(
-        "email"
-    ).value;
+    document.getElementById("email").value;
 
     const newPassword =
-    document.getElementById(
-        "newPassword"
-    ).value;
+    document.getElementById("newPassword").value;
 
     const confirmPassword =
-    document.getElementById(
-        "confirmPassword"
-    ).value;
+    document.getElementById("confirmPassword").value;
 
-    const message =
-    document.getElementById(
-        "message"
-    );
-
-    message.innerText = "";
-
-    if(
-        email === "" ||
-        newPassword === "" ||
-        confirmPassword === ""
-    ){
-        message.style.color = "red";
-        message.innerText =
-        "Please fill all fields";
-        return;
-    }
-
-    if(
-        newPassword !==
-        confirmPassword
-    ){
-        message.style.color = "red";
-        message.innerText =
-        "Passwords do not match";
+    if(newPassword !== confirmPassword){
+        showMessage("Passwords do not match", "error");
         return;
     }
 
     try{
 
         const response =
-        await fetch(
-            "http://localhost:3000/forgot-password",
-            {
-                method:"PUT",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-                body:JSON.stringify({
-                    email,
-                    newPassword
-                })
-            }
-        );
+        await fetch(`${API}/forgot-password`,{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                email,
+                newPassword
+            })
+        });
 
         const data =
         await response.json();
 
-        if(data.success){
+        if(response.ok){
+            showMessage("Password updated successfully", "success");
 
-            message.style.color =
-            "green";
-
-            message.innerText =
-            "Password Updated Successfully";
-
-            setTimeout(() => {
-
-                window.location.href =
-                "login.html";
-
-            }, 1500);
-
-        }else{
-
-            message.style.color =
-            "red";
-
-            message.innerText =
-            data.message;
+            setTimeout(()=>{
+                window.location.href = "login.html";
+            },1200);
+        }
+        else{
+            showMessage(data.message || "Password update failed", "error");
         }
 
     }
     catch(error){
+        showMessage("Server error. Please try again.", "error");
+    }
+}
 
-        message.style.color =
-        "red";
+function showMessage(message,type){
 
-        message.innerText =
-        "Backend connection failed";
+    const box =
+    document.getElementById("messageBox");
+
+    box.innerText = message;
+    box.className = type;
+}
+
+function togglePassword(inputId, icon){
+
+    const input =
+    document.getElementById(inputId);
+
+    if(input.type === "password"){
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    }
+    else{
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
     }
 }

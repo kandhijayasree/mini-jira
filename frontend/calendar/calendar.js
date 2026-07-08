@@ -6,50 +6,37 @@ if(!token || !userId){
     window.location.href = "../login.html";
 }
 
-
 let currentDate = new Date();
 let allTasks = [];
 
-const API =
-`http://localhost:3000/tasks?userId=${userId}`;
-
-/* Load Tasks */
-
-async function loadCalendarTasks(){
+async function loadTasks(){
 
     try{
-
-        const response =
-        await fetch(API,{
-            headers:{
-                Authorization: token
+        const response = await fetch(
+            `http://localhost:3000/tasks?userId=${userId}`,
+            {
+                headers:{
+                    Authorization:token
+                }
             }
-        });
+        );
 
-        allTasks =
-        await response.json();
+        allTasks = await response.json();
 
-        updateStats(allTasks);
         renderCalendar(allTasks);
-
     }
     catch(error){
         console.log(error);
     }
 }
 
-
-/* Render Calendar */
-
 function renderCalendar(tasks){
-
-    const calendarGrid =
-    document.getElementById("calendarGrid");
 
     const monthYear =
     document.getElementById("monthYear");
 
-    calendarGrid.innerHTML = "";
+    const calendarDays =
+    document.getElementById("calendarDays");
 
     const year =
     currentDate.getFullYear();
@@ -58,98 +45,96 @@ function renderCalendar(tasks){
     currentDate.getMonth();
 
     const monthNames = [
-        "January","February","March","April",
-        "May","June","July","August",
-        "September","October","November","December"
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
     ];
 
     monthYear.innerText =
     `${monthNames[month]} ${year}`;
 
-    const firstDay =
-    new Date(year, month, 1).getDay();
+    calendarDays.innerHTML = "";
 
-    const totalDays =
-    new Date(year, month + 1, 0).getDate();
+    const firstDay =
+    new Date(year,month,1).getDay();
+
+    const lastDate =
+    new Date(year,month + 1,0).getDate();
 
     for(let i = 0; i < firstDay; i++){
-
-        calendarGrid.innerHTML +=
-        `<div class="day empty"></div>`;
-
+        calendarDays.innerHTML += `
+            <div class="day empty"></div>
+        `;
     }
 
-    for(let day = 1; day <= totalDays; day++){
+    const today = new Date();
+
+    for(let day = 1; day <= lastDate; day++){
 
         const dateString =
         `${year}-${String(month + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
 
         const dayTasks =
-        tasks.filter(task =>
-            task.dueDate === dateString
-        );
+        tasks.filter(task => task.dueDate === dateString);
 
-        let taskHTML = "";
+        const isToday =
+        day === today.getDate() &&
+        month === today.getMonth() &&
+        year === today.getFullYear();
+
+        let taskHtml = "";
 
         dayTasks.forEach(task => {
 
-            taskHTML += `
-            <div class="task-item">
-                ${task.taskName}
-                <span>${task.status}</span>
-            </div>
+            const priority =
+            (task.priority || "Low").toLowerCase();
+
+            taskHtml += `
+                <div class="task-badge ${priority}"
+                title="${task.taskName}">
+                    ${task.taskName}
+                </div>
             `;
 
         });
 
-        calendarGrid.innerHTML += `
-        <div class="day">
-            <div class="day-number">${day}</div>
-            ${taskHTML}
-        </div>
+        calendarDays.innerHTML += `
+            <div class="day ${isToday ? "today" : ""}">
+                <div class="day-number">${day}</div>
+                ${taskHtml}
+            </div>
         `;
-
     }
 }
 
-/* Previous Month */
-
-function previousMonth(){
-
-    currentDate.setMonth(
-        currentDate.getMonth() - 1
-    );
-
+function prevMonth(){
+    currentDate.setMonth(currentDate.getMonth() - 1);
     renderCalendar(allTasks);
 }
-
-/* Next Month */
 
 function nextMonth(){
-
-    currentDate.setMonth(
-        currentDate.getMonth() + 1
-    );
-
+    currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar(allTasks);
 }
-
-/* Search */
 
 function searchCalendarTasks(){
 
-    const input =
-    document.getElementById("searchCalendar")
-    .value.toLowerCase();
+    const value =
+    document.getElementById("searchCalendar").value.toLowerCase();
 
     const filtered =
-    allTasks.filter(task =>
-        task.taskName.toLowerCase().includes(input) ||
-        task.description.toLowerCase().includes(input) ||
-        task.status.toLowerCase().includes(input)
-    );
+    allTasks.filter(task => {
+
+        const text =
+        `${task.taskName} ${task.description} ${task.assignedTo} ${task.priority} ${task.status}`
+        .toLowerCase();
+
+        return text.includes(value);
+
+    });
 
     renderCalendar(filtered);
 }
 
-loadCalendarTasks();
+
+
+loadTasks();

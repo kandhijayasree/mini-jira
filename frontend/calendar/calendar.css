@@ -1,236 +1,336 @@
+/* ==========================
+   RESET
+========================== */
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Segoe UI',sans-serif;
+    font-family:"Segoe UI",sans-serif;
+}
+
+html{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    overflow-x:hidden;
+    background:#08111f !important;
 }
 
 body{
-    background:#f7f8ff;
-    color:#0f172a;
-}
-
-.dashboard{
-    display:flex;
+    width:100%;
     min-height:100vh;
+    margin:0;
+    padding:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+
+    background:
+    radial-gradient(circle at top right,
+    rgba(37,99,235,.25),
+    transparent 35%),
+
+    radial-gradient(circle at bottom left,
+    rgba(99,102,241,.18),
+    transparent 45%),
+
+    linear-gradient(
+    135deg,
+    #08111f,
+    #0f172a,
+    #111827) !important;
+
+    color:#ffffff;
 }
 
-/* SIDEBAR */
+/* Remove white gap */
+body::before{
+    content:"";
+    display:block;
+    width:100%;
+    height:0;
+}
+
+.calendar-page{
+    width:100%;
+    min-height:100vh;
+    background:transparent;
+}
 
 .sidebar{
-    width:280px;
-    min-height:100vh;
-    background:linear-gradient(180deg,#4f46e5,#6d28d9);
-    padding:30px 18px;
-    color:white;
+    width:240px;
+    height:100vh;
     position:fixed;
     left:0;
     top:0;
+    padding:28px 22px;
+    background:linear-gradient(180deg,#102a63,#1d4ed8,#4338ca);
+    border-right:1px solid rgba(255,255,255,.12);
 }
 
-.sidebar h2{
-    font-size:30px;
-    margin-bottom:35px;
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:42px;
 }
 
-.sidebar a{
-    display:block;
-    padding:16px 18px;
-    margin-bottom:12px;
-    color:white;
+.logo span{
+    font-size:28px;
+}
+
+.logo h2{
+    font-size:28px;
+    font-weight:900;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.menu-link{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:15px 16px;
+    border-radius:13px;
+    color:#e5e7eb;
     text-decoration:none;
-    border-radius:12px;
-    font-size:18px;
+    font-weight:800;
+    transition:.3s;
 }
 
-.sidebar a:hover,
-.sidebar .active{
-    background:rgba(255,255,255,0.18);
+.menu-link i{
+    width:22px;
+    font-size:30px;
+}
+
+.menu-link.active,
+.menu-link:hover{
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    color:white;
+    box-shadow:0 10px 25px rgba(37,99,235,.35);
 }
 
 .logout-btn{
     position:absolute;
-    bottom:30px;
-    left:18px;
-    right:18px;
-    padding:16px;
+    bottom:28px;
+    left:22px;
+    width:195px;
+    height:55px;
     border:none;
-    border-radius:12px;
-    background:#ef4444;
+    border-radius:14px;
+    background:linear-gradient(135deg,#ef4444,#fb7185);
     color:white;
-    font-size:18px;
+    font-size:16px;
+    font-weight:900;
     cursor:pointer;
 }
 
-/* MAIN */
-
 .main{
-    margin-left:280px;
-    flex:1;
-    padding:30px;
-
-
-    background:
-        radial-gradient(circle at 75% 10%, rgba(124,58,237,0.12), transparent 260px),
-        radial-gradient(circle at 90% 30%, rgba(99,102,241,0.12), transparent 300px),
-        linear-gradient(135deg,#f8fafc,#eef2ff,#faf5ff);
+    margin-left:240px;
+    width:calc(100% - 240px);
+    min-height:100vh;
+    padding:32px 38px;
 }
 
 .topbar{
     display:flex;
     justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
+    align-items:flex-start;
+    margin-bottom:35px;
 }
 
 .topbar h1{
-    font-size:42px;
-    margin-bottom:8px;
+    font-size:38px;
+    font-weight:900;
 }
 
 .topbar p{
-    font-size:18px;
-    color:#64748b;
+    margin-top:8px;
+    color:#94a3b8;
+    font-size:16px;
 }
 
+.search-box{
+    width:340px;
+    height:52px;
+    padding:0 18px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    background:#111827;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
 
-/* CALENDAR */
+.search-box input{
+    width:100%;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:white;
+    font-size:15px;
+}
+
+.search-box input::placeholder{
+    color:#94a3b8;
+}
 
 .calendar-card{
-    width:100%;
-    background:white;
+    background:rgba(15,23,42,.92);
+    border:1px solid rgba(255,255,255,.10);
     border-radius:20px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    padding:28px;
+    box-shadow:0 14px 35px rgba(0,0,0,.25);
 }
+
 .calendar-header{
     display:flex;
     justify-content:center;
     align-items:center;
     gap:25px;
-    margin-bottom:25px;
-}
-
-.calendar-header h2{
-    font-size:34px;
-    font-weight:700;
+    margin-bottom:30px;
 }
 
 .calendar-header button{
     width:48px;
     height:48px;
     border:none;
-    border-radius:10px;
-    background:linear-gradient(90deg,#4f46e5,#7c3aed);
+    border-radius:12px;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
     color:white;
-    font-size:20px;
+    font-size:24px;
     cursor:pointer;
 }
 
-.weekdays{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
+.calendar-header h2{
+    font-size:24px;
+    font-weight:900;
+    min-width:260px;
     text-align:center;
-    font-weight:700;
-    margin-bottom:15px;
 }
 
-.weekdays div{
-    padding:15px;
-}
-
-.calendar-grid{
+.weekdays,
+.calendar-days{
     display:grid;
     grid-template-columns:repeat(7,1fr);
-    gap:15px;
-    width:100%;
-}
-.day{
-    min-height:140px;
-    background:#fff;
-    border-radius:15px;
-    padding:12px;
-    border:1px solid #e5e7eb;
-    box-shadow:0 4px 15px rgba(0,0,0,0.05);
 }
 
-.day:hover{
-    background:#eef2ff;
+.weekdays span{
+    text-align:center;
+    color:#94a3b8;
+    font-weight:900;
+    padding:18px 0;
+    border-bottom:1px solid rgba(246, 236, 236, 0.08);
+}
+
+.day{
+    min-height:125px;
+    padding:12px;
+    border-right:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    position:relative;
+}
+
+.day:nth-child(7n){
+    border-right:none;
 }
 
 .day-number{
-    font-size:20px;
-    font-weight:800;
+    font-weight:915;
+    color:#fff;
     margin-bottom:10px;
 }
 
 .empty{
-    background:transparent;
-    box-shadow:none;
+    opacity:.25;
 }
 
-.task-item{
-    background:linear-gradient(90deg,#4f46e5,#7c3aed);
-    color:white;
-    padding:8px;
+.today{
+    background:rgba(10, 72, 205, 0.12);
+}
+
+.today .day-number{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.task-badge{
+    background:rgba(59,130,246,.18);
+    border-left:4px solid #3b82f6;
+    color:#e5e7eb;
     border-radius:8px;
-    font-size:13px;
-    margin-bottom:6px;
+    padding:7px 8px;
+    font-size:19px;
+    margin-bottom:7px;
+    cursor:pointer;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
-.task-item span{
-    display:block;
-    font-size:12px;
-    margin-top:3px;
+.task-badge.high{
+    border-left-color:#ef4444;
 }
 
-/* RESPONSIVE */
+.task-badge.medium{
+    border-left-color:#f97316;
+}
 
-@media(max-width:1000px){
+.task-badge.low{
+    border-left-color:#22c55e;
+}
 
-    .dashboard{
+@media(max-width:900px){
+    .calendar-page{
         flex-direction:column;
     }
 
     .sidebar{
         position:relative;
         width:100%;
-        min-height:auto;
+        height:auto;
     }
 
     .logout-btn{
         position:relative;
         left:0;
-        right:0;
         bottom:0;
+        margin-top:25px;
         width:100%;
-        margin-top:20px;
     }
 
     .main{
         margin-left:0;
         width:100%;
+        padding:24px;
     }
 
     .topbar{
         flex-direction:column;
-        align-items:flex-start;
         gap:20px;
     }
 
-    .search-top{
+    .search-box{
         width:100%;
     }
 
-    .stats-grid{
-        grid-template-columns:1fr;
+    .day{
+        min-height:90px;
+        padding:8px;
     }
 
-    .calendar-grid{
-        grid-template-columns:1fr;
-    }
-
-    .weekdays{
-        display:none;
+    .calendar-header h2{
+        font-size:24px;
+        min-width:180px;
     }
 }

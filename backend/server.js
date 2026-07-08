@@ -3,8 +3,13 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+const bcrypt = require("bcrypt");
 const path = require("path");
 const app = express();
+
+const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/minijira";
+const JWT_SECRET = process.env.JWT_SECRET || "minijira_secret_key";
 
 app.use(cors());
 app.use(express.json());
@@ -12,7 +17,7 @@ app.use(express.json());
    FILE UPLOAD
 ========================== */
 
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const storage = multer.diskStorage({
 
@@ -32,25 +37,34 @@ const upload = multer({
 
 /* DATABASE */
 
-mongoose.connect("mongodb://127.0.0.1:27017/minijira")
+mongoose.connect(MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(error => console.log(error));
 
 /* MODELS */
 
-const User = require("./models/User");
-const Project = require("./models/Project");
-const Task = require("./models/Task");
+const User = require("./models/user");
+const Project = require("./models/project");
+const Task = require("./models/task");
 const Comment = require("./models/Comment");
 const Notification = require("./models/Notification");
 
-const JWT_SECRET = "minijira_secret_key";
-
 /* AUTH MIDDLEWARE */
+
+function sanitizeUser(user) {
+    if (!user) return null;
+
+    const userObject = user.toObject ? user.toObject() : user;
+    const { password, ...safeUser } = userObject;
+    return safeUser;
+}
 
 function verifyToken(req,res,next){
 
-    const token = req.headers.authorization;
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ")
+        ? authHeader.slice(7).trim()
+        : authHeader.trim();
 
     if(!token){
         return res.status(401).json({
@@ -83,6 +97,12 @@ app.post("/register",async(req,res)=>{
     try{
         const { name,email,password } = req.body;
 
+        if(!name || !email || !password){
+            return res.status(400).json({
+                message:"Please provide name, email, and password"
+            });
+        }
+
         const existingUser = await User.findOne({ email });
 
         if(existingUser){
@@ -91,16 +111,18 @@ app.post("/register",async(req,res)=>{
             });
         }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const user = await User.create({
             name,
             email,
-            password
+            password: hashedPassword
         });
 
         res.json({
             success:true,
             message:"Registration Successful",
-            user
+            user: sanitizeUser(user)
         });
     }
     catch(error){
@@ -117,9 +139,17 @@ app.post("/login",async(req,res)=>{
     try{
         const { email,password } = req.body;
 
-        const user = await User.findOne({ email,password });
+        const user = await User.findOne({ email });
 
         if(!user){
+            return res.status(401).json({
+                message:"Invalid Email or Password"
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(!isPasswordValid){
             return res.status(401).json({
                 message:"Invalid Email or Password"
             });
@@ -140,7 +170,7 @@ app.post("/login",async(req,res)=>{
             success:true,
             message:"Login Successful",
             token,
-            user
+            user: sanitizeUser(user)
         });
     }
     catch(error){
@@ -165,13 +195,55 @@ app.put("/forgot-password",async(req,res)=>{
             });
         }
 
-        user.password = newPassword;
+        user.password = await bcrypt.hash(newPassword, 10);
 
         await user.save();
 
         res.json({
             success:true,
             message:"Password Updated Successfully"
+        });
+    }
+    catch(error){
+        res.status(500).json({
+            message:error.message
+        });
+    }
+});
+
+app.put("/users/:id/change-password", verifyToken, async(req,res)=>{
+
+    try{
+        const { currentPassword, newPassword } = req.body;
+
+        if(!currentPassword || !newPassword){
+            return res.status(400).json({
+                message:"Current password and new password are required"
+            });
+        }
+
+        const user = await User.findById(req.params.id);
+
+        if(!user){
+            return res.status(404).json({
+                message:"User not found"
+            });
+        }
+
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+        if(!isCurrentPasswordValid){
+            return res.status(401).json({
+                message:"Current password is incorrect"
+            });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        res.json({
+            success:true,
+            message:"Password changed successfully"
         });
     }
     catch(error){
@@ -188,7 +260,13 @@ app.get("/users/:id",verifyToken,async(req,res)=>{
     try{
         const user = await User.findById(req.params.id);
 
-        res.json(user);
+        if(!user){
+            return res.status(404).json({
+                message:"User not found"
+            });
+        }
+
+        res.json(sanitizeUser(user));
     }
     catch(error){
         res.status(500).json({
@@ -679,6 +757,10 @@ app.post(
 );
 /* SERVER */
 
-app.listen(3000,()=>{
-    console.log("Server Running on Port 3000");
-});
+if (require.main === module) {
+    app.listen(PORT,()=>{
+        console.log(`Server Running on Port ${PORT}`);
+    });
+}
+
+module.exports = app;

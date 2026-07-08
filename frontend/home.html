@@ -4,72 +4,138 @@
     <meta charset="UTF-8">
     <title>Mini Jira</title>
     <link rel="stylesheet" href="home.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
+
 <body>
 
 <section class="home-page">
 
     <nav class="navbar">
-        <h2 class="logo">Mini Jira</h2>
 
-       <div class="nav-links">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-table-columns"></i>
+            </div>
+            <h2>Mini Jira</h2>
+        </div>
 
-    <a href="login.html" class="nav-btn">
-        Login
-    </a>
+        <div class="nav-buttons">
+            <a href="login.html" class="login-btn">Login</a>
+            <a href="register.html" class="register-btn">Register</a>
+        </div>
 
-    <a href="register.html" class="nav-btn">
-        Register
-    </a>
-
-</div>
     </nav>
 
     <div class="hero">
-        <h1>Welcome to Mini Jira</h1>
+
+        <h1>
+            Welcome to <span>Mini Jira</span>
+        </h1>
 
         <p>
             Manage Projects, Tasks and Team Work Efficiently
         </p>
 
-        <a href="login.html" class="get-started-btn">
+        <a href="login.html" class="get-started">
+            <i class="fa-solid fa-rocket"></i>
             Get Started
         </a>
+
     </div>
 
-    <section class="feature-section">
+    <div class="cards">
 
         <div class="feature-card">
-            <div class="icon purple-icon">📁</div>
+            <div class="card-icon blue">
+                <i class="fa-regular fa-folder"></i>
+            </div>
 
             <h3>Create Projects</h3>
 
             <p>
                 Organize multiple projects with simple planning and scheduling.
             </p>
+
+            <a href="login.html" class="learn blue-text">
+                Learn More
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
 
         <div class="feature-card">
-            <div class="icon green-icon">✓</div>
+            <div class="card-icon green">
+                <i class="fa-regular fa-square-check"></i>
+            </div>
 
             <h3>Manage Tasks</h3>
 
             <p>
                 Assign work, track progress and meet deadlines easily.
             </p>
+
+            <a href="login.html" class="learn green-text">
+                Learn More
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
 
         <div class="feature-card">
-            <div class="icon blue-icon">👥</div>
+            <div class="card-icon purple">
+                <i class="fa-solid fa-user-group"></i>
+            </div>
 
             <h3>Team Collaboration</h3>
 
             <p>
                 Share updates, comments and attachments with your team.
             </p>
+
+            <a href="login.html" class="learn purple-text">
+                Learn More
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
 
-    </section>
+    </div>
+
+    <div class="bottom-info">
+
+        <div class="info-box">
+            <i class="fa-solid fa-shield-halved blue-text"></i>
+            <div>
+                <h4>Secure</h4>
+                <p>Your data is always safe and protected.</p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <i class="fa-solid fa-bolt yellow-text"></i>
+            <div>
+                <h4>Fast</h4>
+                <p>Optimized for speed and performance.</p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <i class="fa-solid fa-chart-column blue-text"></i>
+            <div>
+                <h4>Productive</h4>
+                <p>Boost your productivity and achieve more.</p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <i class="fa-solid fa-headset purple-text"></i>
+            <div>
+                <h4>24/7 Support</h4>
+                <p>We're here to help you anytime.</p>
+            </div>
+        </div>
+
+    </div>
 
 </section>
 

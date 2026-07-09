@@ -198,22 +198,21 @@ function hidePasswordError(){
 
 /* TOAST MESSAGE */
 
-function showToast(message,type="success"){
+function showToast(message, type = "success") {
 
-    const toast =
-    document.getElementById("toast");
+    const toast = document.getElementById("toast");
 
-    if(!toast){
-        console.log(message);
+    if (!toast) {
+        alert(message);
         return;
     }
 
     toast.innerText = message;
     toast.className = "toast show " + type;
 
-    setTimeout(function(){
+    setTimeout(() => {
         toast.classList.remove("show");
-    },3000);
+    }, 3000);
 }
 
 /* LOGOUT */

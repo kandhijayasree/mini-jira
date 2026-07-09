@@ -203,7 +203,7 @@ using **Live Server**.
 
 ## Register Page
 
-![Register](screenshots/Register1.png)
+![Register](screenshots/Register.1.png)
 
 ## Dashboard
 

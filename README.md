@@ -203,7 +203,7 @@ using **Live Server**.
 
 ## Register Page
 
-![Register](screenshots/Register.1.png)
+![Register](screenshots/Register.png)
 
 ## Dashboard
 
@@ -233,8 +233,8 @@ using **Live Server**.
 
 ## Profile
 
-![Profile](screenshots/Profile1.png)
-![Profile](screenshots/Profile.2.png)
+![Profile 1](screenshots/Profile1.png)
+![Profile 2](screenshots/Profile.2.png)
 
 
 #  Future Improvements

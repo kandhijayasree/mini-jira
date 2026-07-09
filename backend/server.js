@@ -223,13 +223,16 @@ app.put("/users/:id/change-password", async (req, res) => {
             });
         }
 
-        if (user.password !== currentPassword) {
+        console.log("Entered:", currentPassword);
+        console.log("Saved:", user.password);
+
+        if (String(user.password).trim() !== String(currentPassword).trim()) {
             return res.status(400).json({
-                message: "Current password is wrong"
+                message: "Current password is incorrect"
             });
         }
 
-        user.password = newPassword;
+        user.password = newPassword.trim();
 
         await user.save();
 
@@ -244,7 +247,6 @@ app.put("/users/:id/change-password", async (req, res) => {
         });
     }
 });
-
 /* PROFILE */
 
 app.get("/users/:id",verifyToken,async(req,res)=>{

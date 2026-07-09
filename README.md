@@ -234,7 +234,7 @@ using **Live Server**.
 ## Profile
 
 ![Profile](screenshots/Profile1.png)
-![Profile](screenshots/Profile2.png)
+![Profile](screenshots/Profile.2.png)
 
 
 #  Future Improvements

@@ -211,44 +211,36 @@ app.put("/forgot-password",async(req,res)=>{
     }
 });
 
-app.put("/users/:id/change-password", verifyToken, async(req,res)=>{
-
-    try{
+app.put("/users/:id/change-password", async (req, res) => {
+    try {
         const { currentPassword, newPassword } = req.body;
-
-        if(!currentPassword || !newPassword){
-            return res.status(400).json({
-                message:"Current password and new password are required"
-            });
-        }
 
         const user = await User.findById(req.params.id);
 
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                message:"User not found"
+                message: "User not found"
             });
         }
 
-        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-
-        if(!isCurrentPasswordValid){
-            return res.status(401).json({
-                message:"Current password is incorrect"
+        if (user.password !== currentPassword) {
+            return res.status(400).json({
+                message: "Current password is wrong"
             });
         }
 
-        user.password = await bcrypt.hash(newPassword, 10);
+        user.password = newPassword;
+
         await user.save();
 
         res.json({
-            success:true,
-            message:"Password changed successfully"
+            message: "Password changed successfully"
         });
-    }
-    catch(error){
+
+    } catch (error) {
+        console.log(error);
         res.status(500).json({
-            message:error.message
+            message: "Server error"
         });
     }
 });

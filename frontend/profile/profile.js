@@ -1,26 +1,29 @@
+const API = "http://localhost:3000";
+
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
 
 if(!token || !userId){
-    alert("Please Login First");
     window.location.href = "../login.html";
 }
 
-const API = "http://localhost:3000";
+/* LOAD PROFILE */
 
 async function loadProfile(){
 
     try{
-        const userResponse = await fetch(
-            `${API}/users/${userId}`,
-            {
-                headers:{
-                    Authorization:token
-                }
+        const response = await fetch(`${API}/users/${userId}`,{
+            headers:{
+                Authorization:token
             }
-        );
+        });
 
-        const user = await userResponse.json();
+        const user = await response.json();
+
+        if(!response.ok){
+            showToast(user.message || "Unable to load profile","error");
+            return;
+        }
 
         document.getElementById("userName").innerText =
         user.name || "User";
@@ -34,90 +37,66 @@ async function loadProfile(){
         document.getElementById("email").value =
         user.email || "";
 
-        document.getElementById("infoUserId").innerText =
-        userId;
-
-        document.getElementById("infoEmail").innerText =
-        user.email || "";
-
         localStorage.setItem("userName", user.name || "User");
         localStorage.setItem("userEmail", user.email || "");
-
-        loadProfileStats();
-
     }
     catch(error){
         console.log(error);
+        showToast("Server error while loading profile","error");
     }
 }
 
-async function loadProfileStats(){
-
-    try{
-        const response = await fetch(
-            `${API}/dashboard/${userId}`,
-            {
-                headers:{
-                    Authorization:token
-                }
-            }
-        );
-
-        const data = await response.json();
-
-        document.getElementById("totalProjects").innerText =
-        data.totalProjects || 0;
-
-        document.getElementById("totalTasks").innerText =
-        data.totalTasks || 0;
-
-    }
-    catch(error){
-        console.log(error);
-    }
-}
+/* UPDATE PROFILE */
 
 async function updateProfile(){
 
     const name =
     document.getElementById("name").value.trim();
 
+    const email =
+    document.getElementById("email").value.trim();
+
     if(name === ""){
-        alert("Name required");
+        showToast("Please enter your name","warning");
         return;
     }
 
     try{
-        const response = await fetch(
-            `${API}/users/${userId}`,
-            {
-                method:"PUT",
-                headers:{
-                    "Content-Type":"application/json",
-                    Authorization:token
-                },
-                body:JSON.stringify({
-                    name:name
-                })
-            }
-        );
+        const response = await fetch(`${API}/users/${userId}`,{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json",
+                Authorization:token
+            },
+            body:JSON.stringify({
+                name:name,
+                email:email
+            })
+        });
 
         const data = await response.json();
 
         if(response.ok){
-            showToast("Password Updated successfully");
+
             localStorage.setItem("userName", name);
-            loadProfile();
+            localStorage.setItem("userEmail", email);
+
+            document.getElementById("userName").innerText = name;
+            document.getElementById("userEmail").innerText = email;
+
+            showToast("✅ Profile Updated Successfully","success");
         }
         else{
-            alert(data.message || "Profile update failed");
+            showToast(data.message || "Profile update failed","error");
         }
-
     }
     catch(error){
         console.log(error);
+        showToast("Server error while updating profile","error");
     }
 }
+
+/* CHANGE PASSWORD */
 
 async function changePassword(){
 
@@ -130,10 +109,7 @@ async function changePassword(){
     const confirmPassword =
     document.getElementById("confirmPassword").value.trim();
 
-    const error =
-    document.getElementById("passwordError");
-
-    error.style.display = "none";
+    hidePasswordError();
 
     if(currentPassword === ""){
         showPasswordError("Please enter current password");
@@ -145,8 +121,18 @@ async function changePassword(){
         return;
     }
 
+    if(newPassword.length < 4){
+        showPasswordError("New password must be at least 4 characters");
+        return;
+    }
+
+    if(confirmPassword === ""){
+        showPasswordError("Please confirm new password");
+        return;
+    }
+
     if(newPassword !== confirmPassword){
-        showPasswordError("Passwords do not match");
+        showPasswordError("New password and confirm password do not match");
         return;
     }
 
@@ -160,8 +146,8 @@ async function changePassword(){
                     Authorization:token
                 },
                 body:JSON.stringify({
-                    currentPassword,
-                    newPassword
+                    currentPassword:currentPassword,
+                    newPassword:newPassword
                 })
             }
         );
@@ -169,14 +155,15 @@ async function changePassword(){
         const data = await response.json();
 
         if(response.ok){
-            showToast("Password changed successfully");
 
             document.getElementById("currentPassword").value = "";
             document.getElementById("newPassword").value = "";
             document.getElementById("confirmPassword").value = "";
+
+            showToast("✅ Password Changed Successfully","success");
         }
         else{
-            showPasswordError(data.message);
+            showPasswordError(data.message || "Password change failed");
         }
     }
     catch(error){
@@ -185,15 +172,62 @@ async function changePassword(){
     }
 }
 
+/* PASSWORD ERROR */
+
 function showPasswordError(message){
 
-    const error =
+    const errorBox =
     document.getElementById("passwordError");
 
-    error.innerText = message;
-    error.style.display = "block";
+    if(!errorBox) return;
+
+    errorBox.innerText = message;
+    errorBox.style.display = "block";
 }
 
+function hidePasswordError(){
 
+    const errorBox =
+    document.getElementById("passwordError");
+
+    if(!errorBox) return;
+
+    errorBox.innerText = "";
+    errorBox.style.display = "none";
+}
+
+/* TOAST MESSAGE */
+
+function showToast(message,type="success"){
+
+    const toast =
+    document.getElementById("toast");
+
+    if(!toast){
+        console.log(message);
+        return;
+    }
+
+    toast.innerText = message;
+    toast.className = "toast show " + type;
+
+    setTimeout(function(){
+        toast.classList.remove("show");
+    },3000);
+}
+
+/* LOGOUT */
+
+function logout(){
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+
+    window.location.href = "../login.html";
+}
+
+/* LOAD PAGE */
 
 loadProfile();

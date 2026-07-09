@@ -105,7 +105,7 @@ async function updateProfile(){
         const data = await response.json();
 
         if(response.ok){
-            alert("Profile Updated");
+            showToast("Password Updated successfully");
             localStorage.setItem("userName", name);
             loadProfile();
         }

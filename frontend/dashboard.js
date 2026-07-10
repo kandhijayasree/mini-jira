@@ -2,10 +2,15 @@ const API = "http://localhost:3000";
 
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
-const userName = localStorage.getItem("userName") || "User";
+const notificationStorageKey = `notifications_${userId}`;
+const activityStorageKey = `activities_${userId}`;
+let userName =
+    localStorage.getItem("userName") || "User";
 
-if(!token){
-    alert("Please Login First");
+let userEmail =
+    localStorage.getItem("userEmail") || "";
+
+if(!token || !userId){
     window.location.href = "login.html";
 }
 
@@ -13,80 +18,311 @@ let taskChart = null;
 let statusChart = null;
 let currentDate = new Date();
 let allTasks = [];
+
+/* =========================================
+   LOAD DASHBOARD
+========================================= */
+
 async function loadDashboard(){
 
     try{
 
-        document.getElementById("welcome").innerText =
-        `Welcome, ${userName}`;
+        updateUserInformation();
 
-document.getElementById("dropdownUserName").innerText =
-userName;
-        const response =
-        await fetch(`${API}/dashboard/${userId}`,{
-            headers:{
-                Authorization: token
+        const response = await fetch(
+            `${API}/dashboard/${userId}`,
+            {
+                headers:{
+                    Authorization:token
+                }
             }
-        });
+        );
 
-        const data =
-        await response.json();
-allTasks = await loadCalendarTasks();
-renderCalendar();
-        const totalProjects = data.totalProjects || 0;
-        const totalTasks = data.totalTasks || 0;
-        const openTasks = data.openTasks || 0;
-        const progressTasks = data.progressTasks || data.inProgressTasks || 0;
-        const completedTasks = data.completedTasks || 0;
-        const overdueTasks = data.overdueTasks || 0;
+        const data = await readResponse(response);
 
-        setText("totalProjects", totalProjects);
-        setText("totalTasks", totalTasks);
-        setText("openTasks", openTasks);
-        setText("progressTasks", progressTasks);
-        setText("completedTasks", completedTasks);
-        setText("overdueTasks", overdueTasks);
+        if(!response.ok){
+            showDashboardMessage(
+                data.message || "Unable to load dashboard"
+            );
+            return;
+        }
 
-        setText("legendOpen", openTasks);
-        setText("legendProgress", progressTasks);
-        setText("legendCompleted", completedTasks);
-        setText("legendOverdue", overdueTasks);
+        const totalProjects =
+            Number(data.totalProjects) || 0;
 
-        createCharts(openTasks, progressTasks, completedTasks, overdueTasks);
+        const totalTasks =
+            Number(data.totalTasks) || 0;
+
+        const openTasks =
+            Number(data.openTasks) || 0;
+
+        const progressTasks =
+            Number(
+                data.progressTasks ??
+                data.inProgressTasks
+            ) || 0;
+
+        const completedTasks =
+            Number(data.completedTasks) || 0;
+
+        const overdueTasks =
+            Number(data.overdueTasks) || 0;
+
+        setText("totalProjects",totalProjects);
+        setText("totalTasks",totalTasks);
+        setText("openTasks",openTasks);
+        setText("progressTasks",progressTasks);
+        setText("completedTasks",completedTasks);
+        setText("overdueTasks",overdueTasks);
+
+        setText("legendOpen",openTasks);
+        setText("legendProgress",progressTasks);
+        setText("legendCompleted",completedTasks);
+        setText("legendOverdue",overdueTasks);
+
+        updateCardDescriptions(
+            totalProjects,
+            totalTasks,
+            openTasks,
+            progressTasks,
+            completedTasks,
+            overdueTasks
+        );
+
+        updateWelcomeSummary(
+            totalProjects,
+            openTasks,
+            progressTasks
+        );
+
+        createCharts(
+            openTasks,
+            progressTasks,
+            completedTasks,
+            overdueTasks
+        );
+
+        allTasks = await loadCalendarTasks();
+
+        renderCalendar();
         loadNotifications();
+        loadActivities();
 
     }
     catch(error){
 
-        console.log(error);
+        console.error("Dashboard error:",error);
 
-        createCharts(6,1,1,1);
-        loadNotifications();
+        showDashboardMessage(
+            "Unable to connect to the backend server"
+        );
 
+        showToast(
+            "Unable to load dashboard",
+            "error"
+        );
+    }
+}
+
+/* =========================================
+   USER INFORMATION
+========================================= */
+
+function updateUserInformation(){
+
+    userName =
+        localStorage.getItem("userName") || "User";
+
+    userEmail =
+        localStorage.getItem("userEmail") || "";
+
+    setText(
+        "welcome",
+        `Welcome, ${userName}`
+    );
+
+    setText(
+        "dropdownUserName",
+        userName
+    );
+
+    setText(
+        "dropdownUserEmail",
+        userEmail || "Project Management User"
+    );
+
+    setText(
+        "profileInitial",
+        userName.charAt(0).toUpperCase()
+    );
+}
+
+/* =========================================
+   CARD DESCRIPTIONS
+========================================= */
+
+function updateCardDescriptions(
+    totalProjects,
+    totalTasks,
+    openTasks,
+    progressTasks,
+    completedTasks,
+    overdueTasks
+){
+
+    const completionRate =
+        totalTasks === 0
+            ? 0
+            : Math.round(
+                (completedTasks / totalTasks) * 100
+            );
+
+    setText(
+        "projectsDescription",
+        totalProjects === 1
+            ? "1 project created"
+            : `${totalProjects} projects created`
+    );
+
+    setText(
+        "completionRate",
+        `${completionRate}% completed`
+    );
+
+    setText(
+        "openDescription",
+        openTasks === 0
+            ? "No open tasks"
+            : openTasks === 1
+                ? "1 task currently open"
+                : `${openTasks} tasks currently open`
+    );
+
+    setText(
+        "progressDescription",
+        progressTasks === 0
+            ? "No tasks in progress"
+            : progressTasks === 1
+                ? "1 task being worked on"
+                : `${progressTasks} tasks being worked on`
+    );
+
+    setText(
+        "completedDescription",
+        completedTasks === 0
+            ? "No completed tasks"
+            : completedTasks === 1
+                ? "1 task completed"
+                : `${completedTasks} tasks completed`
+    );
+
+    setText(
+        "overdueDescription",
+        overdueTasks === 0
+            ? "No overdue tasks"
+            : overdueTasks === 1
+                ? "1 task needs attention"
+                : `${overdueTasks} tasks need attention`
+    );
+}
+
+function updateWelcomeSummary(
+    totalProjects,
+    openTasks,
+    progressTasks
+){
+
+    const summary =
+        document.getElementById("welcomeSummary");
+
+    if(!summary) return;
+
+    if(
+        totalProjects === 0 &&
+        openTasks === 0 &&
+        progressTasks === 0
+    ){
+        summary.innerText =
+            "Create your first project and start organizing your work.";
+        return;
     }
 
+    summary.innerText =
+        `You have ${openTasks} open task(s), ` +
+        `${progressTasks} task(s) in progress and ` +
+        `${totalProjects} project(s).`;
 }
+
+function showDashboardMessage(message){
+
+    const summary =
+        document.getElementById("welcomeSummary");
+
+    if(summary){
+        summary.innerText = message;
+    }
+}
+
+/* =========================================
+   HELPER
+========================================= */
 
 function setText(id,value){
 
-    const el =
-    document.getElementById(id);
+    const element =
+        document.getElementById(id);
 
-    if(el){
-        el.innerText = value;
+    if(element){
+        element.innerText = value;
     }
-
 }
 
-function createCharts(openTasks, progressTasks, completedTasks, overdueTasks){
+async function readResponse(response){
 
-    const taskCtx =
-    document.getElementById("taskChart");
+    const contentType =
+        response.headers.get("content-type") || "";
 
-    const statusCtx =
-    document.getElementById("statusChart");
+    if(contentType.includes("application/json")){
+        return await response.json();
+    }
 
-    if(!taskCtx || !statusCtx){
+    return {
+        message:await response.text()
+    };
+}
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+/* =========================================
+   CHARTS
+========================================= */
+
+function createCharts(
+    openTasks,
+    progressTasks,
+    completedTasks,
+    overdueTasks
+){
+
+    const taskCanvas =
+        document.getElementById("taskChart");
+
+    const statusCanvas =
+        document.getElementById("statusChart");
+
+    if(
+        !taskCanvas ||
+        !statusCanvas ||
+        typeof Chart === "undefined"
+    ){
         return;
     }
 
@@ -98,253 +334,722 @@ function createCharts(openTasks, progressTasks, completedTasks, overdueTasks){
         statusChart.destroy();
     }
 
-    taskChart = new Chart(taskCtx,{
-        type:"bar",
-        data:{
-            labels:["Open","Progress","Completed","Overdue"],
-            datasets:[{
-                label:"Tasks",
-                data:[openTasks,progressTasks,completedTasks,overdueTasks],
-                backgroundColor:["#22c55e","#f97316","#8b5cf6","#ef4444"],
-                borderRadius:10
-            }]
-        },
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            plugins:{
-                legend:{
-                    labels:{
-                        color:"#e5e7eb"
-                    }
-                }
+    taskChart = new Chart(
+        taskCanvas,
+        {
+            type:"bar",
+
+            data:{
+                labels:[
+                    "Open",
+                    "Progress",
+                    "Completed",
+                    "Overdue"
+                ],
+
+                datasets:[{
+                    label:"Tasks",
+
+                    data:[
+                        openTasks,
+                        progressTasks,
+                        completedTasks,
+                        overdueTasks
+                    ],
+
+                    backgroundColor:[
+                        "#22c55e",
+                        "#f97316",
+                        "#8b5cf6",
+                        "#ef4444"
+                    ],
+
+                    borderRadius:9,
+
+                    maxBarThickness:115
+                }]
             },
-            scales:{
-                x:{
-                    ticks:{
-                        color:"#cbd5e1"
-                    },
-                    grid:{
-                        color:"rgba(255,255,255,.08)"
+
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+
+                plugins:{
+                    legend:{
+                        labels:{
+                            color:"#dbe3ee",
+                            boxWidth:30
+                        }
                     }
                 },
-                y:{
-                    beginAtZero:true,
-                    ticks:{
-                        color:"#cbd5e1",
-                        precision:0
+
+                scales:{
+                    x:{
+                        ticks:{
+                            color:"#cbd5e1"
+                        },
+
+                        grid:{
+                            color:"rgba(255,255,255,.07)"
+                        }
                     },
-                    grid:{
-                        color:"rgba(255,255,255,.08)"
+
+                    y:{
+                        beginAtZero:true,
+
+                        ticks:{
+                            color:"#cbd5e1",
+                            precision:0,
+                            stepSize:1
+                        },
+
+                        grid:{
+                            color:"rgba(255,255,255,.07)"
+                        }
                     }
                 }
             }
         }
-    });
+    );
 
-    statusChart = new Chart(statusCtx,{
-        type:"doughnut",
-        data:{
-            labels:["Open","In Progress","Completed","Overdue"],
-            datasets:[{
-                data:[openTasks,progressTasks,completedTasks,overdueTasks],
-                backgroundColor:["#22c55e","#f97316","#8b5cf6","#ef4444"],
-                borderWidth:0
-            }]
-        },
-        options:{
-            responsive:false,
-            maintainAspectRatio:false,
-            cutout:"65%",
-            plugins:{
-                legend:{
-                    display:false
+    statusChart = new Chart(
+        statusCanvas,
+        {
+            type:"doughnut",
+
+            data:{
+                labels:[
+                    "Open",
+                    "In Progress",
+                    "Completed",
+                    "Overdue"
+                ],
+
+                datasets:[{
+                    data:[
+                        openTasks,
+                        progressTasks,
+                        completedTasks,
+                        overdueTasks
+                    ],
+
+                    backgroundColor:[
+                        "#22c55e",
+                        "#f97316",
+                        "#8b5cf6",
+                        "#ef4444"
+                    ],
+
+                    borderWidth:0
+                }]
+            },
+
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                cutout:"66%",
+
+                plugins:{
+                    legend:{
+                        display:false
+                    }
                 }
             }
         }
-    });
-
+    );
 }
+
+/* =========================================
+   RECENT PROJECTS
+========================================= */
 
 async function loadRecentProjects(){
 
-    const box =
-    document.getElementById("recentProjectsList");
+    const container =
+        document.getElementById(
+            "recentProjectsList"
+        );
 
-    if(!box){
-        return;
-    }
+    if(!container) return;
 
     try{
 
-        const response =
-        await fetch(`${API}/projects-with-task-count?userId=${userId}`,{
-            headers:{
-                Authorization: token
+        let response = await fetch(
+            `${API}/projects-with-task-count?userId=${userId}`,
+            {
+                headers:{
+                    Authorization:token
+                }
             }
-        });
+        );
+
+        if(!response.ok){
+
+            response = await fetch(
+                `${API}/projects?userId=${userId}`,
+                {
+                    headers:{
+                        Authorization:token
+                    }
+                }
+            );
+        }
+
+        const data = await readResponse(response);
+
+        if(!response.ok){
+            throw new Error(
+                data.message || "Unable to load projects"
+            );
+        }
 
         const projects =
-        await response.json();
+            Array.isArray(data)
+                ? data
+                : data.projects || [];
 
-        box.innerHTML = "";
+        container.innerHTML = "";
 
-        projects
-        .slice(-2)
-        .reverse()
-        .forEach(project => {
+        const recentProjects =
+            [...projects]
+                .filter(
+                    project =>
+                    project.status !== "Archived"
+                )
+                .slice(-3)
+                .reverse();
 
-            box.innerHTML += `
+        if(recentProjects.length === 0){
+
+            container.innerHTML = `
+                <p class="empty-text">
+                    No projects created yet
+                </p>
+            `;
+
+            return;
+        }
+
+        recentProjects.forEach(project => {
+
+            container.innerHTML += `
                 <div class="project-item">
-                    <div class="project-icon blue-folder">
+
+                    <div class="project-icon">
                         <i class="fa-solid fa-folder"></i>
                     </div>
 
                     <div class="project-info">
-                        <h4>${project.projectName || "Untitled Project"}</h4>
-                        <p>${project.description || "No description"}</p>
+
+                        <h4>
+                            ${escapeHtml(
+                                project.projectName ||
+                                "Untitled Project"
+                            )}
+                        </h4>
+
+                        <p>
+                            ${escapeHtml(
+                                project.description ||
+                                "No description"
+                            )}
+                        </p>
+
                     </div>
 
-                    <span class="badge active-badge">
-                        ${project.status || "Active"}
+                    <span class="active-badge">
+                        ${escapeHtml(
+                            project.status || "Active"
+                        )}
                     </span>
+
                 </div>
             `;
-
         });
-
-        if(projects.length === 0){
-            box.innerHTML = `<p class="empty-text">No projects yet</p>`;
-        }
 
     }
     catch(error){
-        console.log(error);
-    }
 
+        console.error(error);
+
+        container.innerHTML = `
+            <p class="empty-text">
+                Unable to load recent projects
+            </p>
+        `;
+    }
 }
+
+/* =========================================
+   UPCOMING TASKS
+========================================= */
 
 async function loadUpcomingTasks(){
 
-    const box =
-    document.getElementById("upcomingTasksList");
+    const container =
+        document.getElementById(
+            "upcomingTasksList"
+        );
 
-    if(!box){
-        return;
-    }
+    if(!container) return;
 
     try{
 
-        const response =
-        await fetch(`${API}/tasks?userId=${userId}`,{
-            headers:{
-                Authorization: token
+        const response = await fetch(
+            `${API}/tasks?userId=${userId}`,
+            {
+                headers:{
+                    Authorization:token
+                }
             }
-        });
+        );
+
+        const data = await readResponse(response);
+
+        if(!response.ok){
+            throw new Error(
+                data.message || "Unable to load tasks"
+            );
+        }
 
         const tasks =
-        await response.json();
+            Array.isArray(data)
+                ? data
+                : data.tasks || [];
 
-        const upcoming =
-        tasks
-        .filter(task => task.dueDate)
-        .sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate))
-        .slice(0,2);
+        const upcomingTasks =
+            [...tasks]
+                .filter(task => task.dueDate)
+                .sort(
+                    (first,second) =>
+                    parseDate(first.dueDate) -
+                    parseDate(second.dueDate)
+                )
+                .slice(0,4);
 
-        box.innerHTML = "";
+        container.innerHTML = "";
 
-        upcoming.forEach(task => {
+        if(upcomingTasks.length === 0){
 
-            box.innerHTML += `
+            container.innerHTML = `
+                <p class="empty-text">
+                    No upcoming tasks
+                </p>
+            `;
+
+            return;
+        }
+
+        upcomingTasks.forEach(task => {
+
+            container.innerHTML += `
                 <div class="task-item">
+
                     <span class="task-ring"></span>
 
                     <div class="task-info">
-                        <h4>${task.taskName || "Untitled Task"}</h4>
-                        <p>${task.description || "No description"}</p>
+
+                        <h4>
+                            ${escapeHtml(
+                                task.taskName ||
+                                "Untitled Task"
+                            )}
+                        </h4>
+
+                        <p>
+                            ${escapeHtml(
+                                task.description ||
+                                "No description"
+                            )}
+                        </p>
+
                     </div>
 
                     <div class="task-date">
+
                         <i class="fa-regular fa-calendar"></i>
-                        ${formatDueDate(task.dueDate)}
+
+                        ${escapeHtml(
+                            formatDueDate(task.dueDate)
+                        )}
+
                     </div>
+
                 </div>
             `;
-
         });
-
-        if(upcoming.length === 0){
-            box.innerHTML = `<p class="empty-text">No upcoming tasks</p>`;
-        }
 
     }
     catch(error){
-        console.log(error);
-    }
 
+        console.error(error);
+
+        container.innerHTML = `
+            <p class="empty-text">
+                Unable to load upcoming tasks
+            </p>
+        `;
+    }
 }
 
-function formatDueDate(date){
+function parseDate(dateValue){
 
-    const today =
-    new Date();
-
-    const due =
-    new Date(date);
-
-    today.setHours(0,0,0,0);
-    due.setHours(0,0,0,0);
-
-    const diff =
-    (due - today) / (1000 * 60 * 60 * 24);
-
-    if(diff === 0){
-        return "Today";
+    if(!dateValue){
+        return new Date(0);
     }
 
-    if(diff === 1){
-        return "Tomorrow";
+    const dateText =
+        String(dateValue).split("T")[0];
+
+    const parts = dateText.split("-");
+
+    if(parts.length === 3){
+
+        return new Date(
+            Number(parts[0]),
+            Number(parts[1]) - 1,
+            Number(parts[2])
+        );
     }
 
-    return due.toLocaleDateString();
+    return new Date(dateValue);
+}
 
+function formatDueDate(dateValue){
+
+    const dueDate =
+        parseDate(dateValue);
+
+    if(Number.isNaN(dueDate.getTime())){
+        return "No date";
+    }
+
+    return dueDate.toLocaleDateString(
+        "en-GB",
+        {
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric"
+        }
+    );
+}
+
+/* =========================================
+   ACTIVITY
+========================================= */
+
+function loadActivities(){
+
+    const container =
+        document.getElementById("activityList");
+
+    if(!container){
+        return;
+    }
+
+    const activities =
+        JSON.parse(
+            localStorage.getItem(activityStorageKey)
+        ) || [];
+
+    container.innerHTML = "";
+
+    if(activities.length === 0){
+
+        container.innerHTML = `
+            <p class="empty-text">
+                No recent activity
+            </p>
+        `;
+
+        return;
+    }
+
+    activities.forEach(activity => {
+
+        container.innerHTML += `
+            <div class="activity-item">
+
+                <div class="activity-icon">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+
+                <div class="activity-content">
+
+                    <h4>
+                        ${escapeHtml(
+                            activity.message ||
+                            "Activity recorded"
+                        )}
+                    </h4>
+
+                    <p>
+                        ${escapeHtml(
+                            activity.time || ""
+                        )}
+                    </p>
+
+                </div>
+
+            </div>
+        `;
+    });
+}
+function addActivity(message){
+
+    let activities =
+        JSON.parse(
+            localStorage.getItem(activityStorageKey)
+        ) || [];
+
+    activities.unshift({
+        message: message,
+        time: new Date().toLocaleString(),
+        userId: userId
+    });
+
+    localStorage.setItem(
+        activityStorageKey,
+        JSON.stringify(activities)
+    );
+}
+
+/* =========================================
+   NOTIFICATIONS
+========================================= */
+
+function loadNotifications(){
+
+    const list =
+        document.getElementById("notificationList");
+
+    const count =
+        document.getElementById("notificationCount");
+
+    if(!list || !count){
+        return;
+    }
+
+    const notifications =
+        JSON.parse(
+            localStorage.getItem(notificationStorageKey)
+        ) || [];
+
+    count.innerText =
+        notifications.length > 99
+            ? "99+"
+            : notifications.length;
+
+    list.innerHTML = "";
+
+    if(notifications.length === 0){
+
+        list.innerHTML = `
+            <div class="notification-empty">
+                <i class="fa-regular fa-bell-slash"></i>
+                <h4>No notifications yet</h4>
+                <p>Your updates will appear here.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    notifications.forEach(notification => {
+
+        list.innerHTML += `
+            <div class="notification-item">
+
+                <div class="notification-icon">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+
+                <div class="notification-content">
+                    <h4>
+                        ${escapeHtml(
+                            notification.message ||
+                            "Notification"
+                        )}
+                    </h4>
+
+                    <p>
+                        ${escapeHtml(
+                            notification.time || ""
+                        )}
+                    </p>
+                </div>
+
+            </div>
+        `;
+    });
+}
+
+function clearNotifications(){
+
+    localStorage.removeItem(notificationStorageKey);
+
+    loadNotifications();
+
+    showToast(
+        "Notifications cleared",
+        "success"
+    );
+}
+
+function toggleNotifications(){
+
+    const notificationPanel =
+        document.getElementById(
+            "notificationPanel"
+        );
+
+    const profileDropdown =
+        document.getElementById(
+            "profileDropdown"
+        );
+
+    if(profileDropdown){
+        profileDropdown.classList.remove("show");
+    }
+
+    if(notificationPanel){
+        notificationPanel.classList.toggle("show");
+    }
+}
+
+/* =========================================
+   PROFILE DROPDOWN
+========================================= */
+
+function toggleProfileMenu(){
+
+    const profileDropdown =
+        document.getElementById(
+            "profileDropdown"
+        );
+
+    const notificationPanel =
+        document.getElementById(
+            "notificationPanel"
+        );
+
+    if(notificationPanel){
+        notificationPanel.classList.remove("show");
+    }
+
+    if(profileDropdown){
+        profileDropdown.classList.toggle("show");
+    }
+}
+
+/* =========================================
+   CALENDAR
+========================================= */
+
+async function loadCalendarTasks(){
+
+    try{
+
+        const response = await fetch(
+            `${API}/tasks?userId=${userId}`,
+            {
+                headers:{
+                    Authorization:token
+                }
+            }
+        );
+
+        const data = await readResponse(response);
+
+        if(!response.ok){
+            return [];
+        }
+
+        return Array.isArray(data)
+            ? data
+            : data.tasks || [];
+
+    }
+    catch(error){
+
+        console.error("Calendar tasks error:",error);
+
+        return [];
+    }
 }
 
 function renderCalendar(){
 
     const monthYear =
-    document.getElementById("monthYear");
+        document.getElementById("monthYear");
 
     const calendarDays =
-    document.getElementById("calendarDays");
+        document.getElementById(
+            "calendarDays"
+        );
 
     if(!monthYear || !calendarDays){
         return;
     }
 
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    const year =
+        currentDate.getFullYear();
+
+    const month =
+        currentDate.getMonth();
 
     const monthNames = [
-        "January","February","March","April","May","June",
-        "July","August","September","October","November","December"
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
     ];
 
-    const weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const weekDays = [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+    ];
 
-    monthYear.innerText = `${monthNames[month]} ${year}`;
+    monthYear.innerText =
+        `${monthNames[month]} ${year}`;
 
     calendarDays.innerHTML = "";
 
     weekDays.forEach(day => {
-        calendarDays.innerHTML += `<span>${day}</span>`;
+
+        calendarDays.innerHTML += `
+            <span>${day}</span>
+        `;
     });
 
-    const firstDay = new Date(year,month,1).getDay();
-    const lastDate = new Date(year,month + 1,0).getDate();
+    const firstDay =
+        new Date(year,month,1).getDay();
 
-    for(let i = 0; i < firstDay; i++){
-        calendarDays.innerHTML += `<b class="empty"></b>`;
+    const lastDate =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+    for(let index = 0; index < firstDay; index++){
+
+        calendarDays.innerHTML += `
+            <b class="empty"></b>
+        `;
     }
 
     const today = new Date();
@@ -352,211 +1057,250 @@ function renderCalendar(){
     for(let day = 1; day <= lastDate; day++){
 
         const isToday =
-        day === today.getDate() &&
-        month === today.getMonth() &&
-        year === today.getFullYear();
+            day === today.getDate() &&
+            month === today.getMonth() &&
+            year === today.getFullYear();
 
         const taskDate =
-        `${year}-${String(month + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+            `${year}-` +
+            `${String(month + 1).padStart(2,"0")}-` +
+            `${String(day).padStart(2,"0")}`;
 
         const tasksOnDate =
-        allTasks.filter(task => task.dueDate === taskDate);
+            allTasks.filter(task => {
+
+                if(!task.dueDate){
+                    return false;
+                }
+
+                const dueDate =
+                    String(task.dueDate)
+                        .split("T")[0];
+
+                return dueDate === taskDate;
+            });
 
         let dots = "";
 
-        tasksOnDate.forEach(task => {
+        tasksOnDate
+            .slice(0,4)
+            .forEach(task => {
 
-            let dotClass = "dot-open";
+                let dotClass = "dot-open";
 
-            if(task.status === "In Progress"){
-                dotClass = "dot-progress";
-            }
-            else if(task.status === "Completed"){
-                dotClass = "dot-completed";
-            }
-            else if(task.status === "Overdue"){
-                dotClass = "dot-overdue";
-            }
+                if(task.status === "In Progress"){
+                    dotClass = "dot-progress";
+                }
+                else if(task.status === "Completed"){
+                    dotClass = "dot-completed";
+                }
+                else if(task.status === "Overdue"){
+                    dotClass = "dot-overdue";
+                }
 
-            dots += `<i class="calendar-dot ${dotClass}"></i>`;
-        });
+                dots += `
+                    <i
+                        class="calendar-dot ${dotClass}"
+                        title="${escapeHtml(
+                            task.taskName || "Task"
+                        )}"
+                    ></i>
+                `;
+            });
 
         calendarDays.innerHTML += `
-    <div class="calendar-day ${isToday ? "today" : ""}">
-        <div class="day-number">${day}</div>
+            <div class="calendar-day ${
+                isToday ? "today" : ""
+            }">
 
-        <div class="calendar-dots">
-            ${dots}
-        </div>
-    </div>
-`;
+                <div class="day-number">
+                    ${day}
+                </div>
+
+                <div class="calendar-dots">
+                    ${dots}
+                </div>
+
+            </div>
+        `;
     }
 }
+
 function prevMonth(){
 
-    currentDate.setMonth(currentDate.getMonth() - 1);
+    currentDate =
+        new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth() - 1,
+            1
+        );
 
     renderCalendar();
 }
 
 function nextMonth(){
 
-    currentDate.setMonth(currentDate.getMonth() + 1);
+    currentDate =
+        new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth() + 1,
+            1
+        );
 
     renderCalendar();
 }
-function loadNotifications(){
 
-    const list = document.getElementById("notificationList");
-    const count = document.getElementById("notificationCount");
-
-    const notifications =
-    JSON.parse(localStorage.getItem("notifications")) || [];
-
-    list.innerHTML = "";
-
-    if(notifications.length === 0){
-        list.innerHTML = `
-            <div class="notification-item">
-                <h4>No notifications yet</h4>
-                <p>Create a project or task to see updates here.</p>
-            </div>
-        `;
-        count.innerText = "0";
-        return;
-    }
-
-    notifications.forEach(item => {
-
-        const title =
-        item.message || item.title || "Notification";
-
-        const time =
-        item.time || item.createdAt || item.date || "";
-
-        list.innerHTML += `
-            <div class="notification-item">
-                <h4>${title}</h4>
-                <p>${time}</p>
-            </div>
-        `;
-    });
-
-    count.innerText = notifications.length;
-}
-
-function toggleNotifications(){
-
-    document
-    .getElementById("notificationPanel")
-    .classList.toggle("show");
-
-}
-
-function toggleProfileMenu(){
-
-    document
-    .getElementById("profileDropdown")
-    .classList.toggle("show");
-
-}
-
-document.addEventListener("click",function(e){
-
-    const notification =
-    document.querySelector(".notification-wrapper");
-
-    const profile =
-    document.querySelector(".profile-menu");
-
-    if(notification && !notification.contains(e.target)){
-        document
-        .getElementById("notificationPanel")
-        .classList.remove("show");
-    }
-
-    if(profile && !profile.contains(e.target)){
-        document
-        .getElementById("profileDropdown")
-        .classList.remove("show");
-    }
-
-});
+/* =========================================
+   DASHBOARD SEARCH
+========================================= */
 
 const searchInput =
-document.querySelector(".search-box input");
+    document.getElementById(
+        "dashboardSearch"
+    );
 
 if(searchInput){
 
-    searchInput.addEventListener("input",function(){
+    searchInput.addEventListener(
+        "input",
+        function(){
 
-        const value =
-        this.value.toLowerCase();
+            const searchValue =
+                this.value
+                    .trim()
+                    .toLowerCase();
 
-        const items =
-        document.querySelectorAll(".project-item,.task-item,.stat-card");
+            const searchableItems =
+                document.querySelectorAll(
+                    ".project-item, .task-item, .activity-item"
+                );
 
-        items.forEach(item => {
+            searchableItems.forEach(item => {
 
-            const text =
-            item.innerText.toLowerCase();
+                const itemText =
+                    item.innerText.toLowerCase();
 
-            item.style.display =
-            text.includes(value) ? "flex" : "none";
-
-        });
-
-    });
-
+                item.style.display =
+                    itemText.includes(searchValue)
+                        ? "flex"
+                        : "none";
+            });
+        }
+    );
 }
-function addNotification(message){
 
-    let notifications =
-    JSON.parse(localStorage.getItem("notifications")) || [];
+/* =========================================
+   CLOSE DROPDOWNS
+========================================= */
 
-    notifications.unshift({
-        message:message,
-        time:new Date().toLocaleString()
-    });
+document.addEventListener(
+    "click",
+    function(event){
 
-    // Keep only latest 20 notifications
-    if(notifications.length > 20){
-        notifications = notifications.slice(0,20);
+        const notificationWrapper =
+            document.querySelector(
+                ".notification-wrapper"
+            );
+
+        const profileMenu =
+            document.querySelector(
+                ".profile-menu"
+            );
+
+        const notificationPanel =
+            document.getElementById(
+                "notificationPanel"
+            );
+
+        const profileDropdown =
+            document.getElementById(
+                "profileDropdown"
+            );
+
+        if(
+            notificationWrapper &&
+            !notificationWrapper.contains(event.target)
+        ){
+            notificationPanel?.classList.remove("show");
+        }
+
+        if(
+            profileMenu &&
+            !profileMenu.contains(event.target)
+        ){
+            profileDropdown?.classList.remove("show");
+        }
+    }
+);
+
+/* =========================================
+   TOAST
+========================================= */
+
+function showToast(
+    message,
+    type = "success"
+){
+
+    const toast =
+        document.getElementById("toast");
+
+    if(!toast){
+        console.log(message);
+        return;
     }
 
-    localStorage.setItem(
-        "notifications",
-        JSON.stringify(notifications)
+    toast.innerText = message;
+
+    toast.className =
+        `toast show ${type}`;
+
+    window.clearTimeout(
+        showToast.timeoutId
     );
 
+    showToast.timeoutId =
+        window.setTimeout(
+            function(){
+                toast.className = "toast";
+            },
+            3000
+        );
 }
+
+/* =========================================
+   LOGOUT
+========================================= */
 
 function logout(){
 
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
-      localStorage.removeItem("userEmail");
+    localStorage.removeItem("userEmail");
 
-    // Don't remove notifications
+    /*
+       Notifications and activities are not
+       removed, so they remain after login again.
+    */
 
-    window.location.href="login.html";
-
+    window.location.href = "login.html";
 }
-async function loadCalendarTasks() {
 
-    const response = await fetch(
-        `http://localhost:3000/tasks?userId=${userId}`,
-        {
-            headers: {
-                Authorization: token
-            }
-        }
-    );
+/* =========================================
+   START DASHBOARD
+========================================= */
 
-    return await response.json();
+async function initializeDashboard(){
+
+    loadNotifications();
+    loadActivities();
+
+    await Promise.all([
+        loadDashboard(),
+        loadRecentProjects(),
+        loadUpcomingTasks()
+    ]);
 }
-loadDashboard();
- loadNotifications();
-loadRecentProjects();
-loadUpcomingTasks();
+
+initializeDashboard();

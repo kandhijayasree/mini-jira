@@ -20,6 +20,8 @@ async function loadDashboard(){
         document.getElementById("welcome").innerText =
         `Welcome, ${userName}`;
 
+document.getElementById("dropdownUserName").innerText =
+userName;
         const response =
         await fetch(`${API}/dashboard/${userId}`,{
             headers:{

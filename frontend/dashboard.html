@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Mini Jira Dashboard</title>
 
     <link rel="stylesheet" href="dashboard.css">
 
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -17,101 +24,177 @@
 
 <div class="dashboard">
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
 
         <div class="logo">
-            <span>🚀</span>
+            <span class="logo-icon">🚀</span>
             <h2>Mini Jira</h2>
         </div>
 
         <nav class="menu">
+
             <a href="dashboard.html" class="menu-link active">
-                <i class="fa-solid fa-house"></i> Dashboard
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
             </a>
 
             <a href="project/project.html" class="menu-link">
-                <i class="fa-regular fa-folder"></i> Projects
+                <i class="fa-regular fa-folder"></i>
+                <span>Projects</span>
             </a>
 
             <a href="task/task.html" class="menu-link">
-                <i class="fa-regular fa-square-check"></i> Tasks
+                <i class="fa-regular fa-square-check"></i>
+                <span>Tasks</span>
             </a>
 
             <a href="kanban/kanban.html" class="menu-link">
-                <i class="fa-solid fa-table-columns"></i> Kanban Board
+                <i class="fa-solid fa-table-columns"></i>
+                <span>Kanban Board</span>
             </a>
 
             <a href="calendar/calendar.html" class="menu-link">
-                <i class="fa-regular fa-calendar"></i> Calendar
+                <i class="fa-regular fa-calendar"></i>
+                <span>Calendar</span>
             </a>
 
             <a href="report/report.html" class="menu-link">
-                <i class="fa-solid fa-chart-simple"></i> Reports
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Reports</span>
             </a>
 
             <a href="profile/profile.html" class="menu-link">
-                <i class="fa-regular fa-user"></i> Profile
+                <i class="fa-regular fa-user"></i>
+                <span>Profile</span>
             </a>
-        </nav>
 
-        
+        </nav>
 
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main">
 
+        <!-- TOP BAR -->
         <header class="topbar">
 
             <div class="welcome-block">
                 <h1 id="welcome">Welcome, User</h1>
-                <p>Here's what's happening with your projects today.</p>
+
+                <p id="welcomeSummary">
+                    Here’s what’s happening with your projects today.
+                </p>
             </div>
 
             <div class="top-actions">
 
+                <!-- NOTIFICATION -->
                 <div class="notification-wrapper">
-                    <button class="bell-btn" onclick="toggleNotifications()">
+
+                    <button
+                        type="button"
+                        class="bell-btn"
+                        onclick="toggleNotifications()"
+                    >
                         <i class="fa-regular fa-bell"></i>
                         <span id="notificationCount">0</span>
                     </button>
 
-                    <div id="notificationPanel" class="notification-panel">
-                        <h3>Notifications</h3>
+                    <div
+                        id="notificationPanel"
+                        class="notification-panel"
+                    >
+
+                        <div class="notification-heading">
+
+                            <h3>Notifications</h3>
+
+                            <button
+                                type="button"
+                                class="clear-notification-btn"
+                                onclick="clearNotifications()"
+                            >
+                                Clear All
+                            </button>
+
+                        </div>
+
                         <div id="notificationList"></div>
+
                     </div>
+
                 </div>
 
+                <!-- SEARCH -->
                 <div class="search-box">
+
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search tasks, projects...">
+
+                    <input
+                        type="text"
+                        id="dashboardSearch"
+                        placeholder="Search tasks, projects..."
+                    >
+
                 </div>
 
+                <!-- PROFILE -->
                 <div class="profile-menu">
 
-                    <div class="profile-dot">I</div>
+                    <div
+                        class="profile-dot"
+                        id="profileInitial"
+                    >
+                        U
+                    </div>
 
-                    <button class="profile-arrow" onclick="toggleProfileMenu()">
+                    <button
+                        type="button"
+                        class="profile-arrow"
+                        onclick="toggleProfileMenu()"
+                    >
                         <i class="fa-solid fa-chevron-down"></i>
                     </button>
 
-                    <div id="profileDropdown" class="profile-dropdown">
-                     <h4 id="dropdownUserName">User</h4>
-                        <p>Administrator</p>
+                    <div
+                        id="profileDropdown"
+                        class="profile-dropdown"
+                    >
+
+                        <div class="dropdown-user">
+
+                            <h4 id="dropdownUserName">
+                                User
+                            </h4>
+
+                            <p id="dropdownUserEmail">
+                                Project Management User
+                            </p>
+
+                        </div>
 
                         <hr>
 
                         <a href="profile/profile.html">
-                            <i class="fa-regular fa-user"></i> Profile
+                            <i class="fa-regular fa-user"></i>
+                            <span>Profile</span>
                         </a>
 
                         <a href="dashboard.html">
-                            <i class="fa-solid fa-house"></i> Dashboard
+                            <i class="fa-solid fa-house"></i>
+                            <span>Dashboard</span>
                         </a>
-  <a href="#" class="dropdown-item logout-item" onclick="logout()">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span>Logout</span>
-    </a>
-                      
+
+                        <button
+                            type="button"
+                            class="dropdown-logout"
+                            onclick="logout()"
+                        >
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Logout</span>
+                        </button>
+
                     </div>
 
                 </div>
@@ -120,138 +203,304 @@
 
         </header>
 
+        <!-- STATISTICS -->
         <section class="stats-grid">
 
             <div class="stat-card">
-                <div class="stat-icon icon-blue">TP</div>
-                <div>
+
+                <div class="stat-icon icon-blue">
+                    TP
+                </div>
+
+                <div class="stat-details">
                     <p>Total Projects</p>
                     <h2 id="totalProjects">0</h2>
-                    <span>↑ 10% from last month</span>
+
+                    <span id="projectsDescription">
+                        No projects created
+                    </span>
                 </div>
+
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-violet">TT</div>
-                <div>
+
+                <div class="stat-icon icon-violet">
+                    TT
+                </div>
+
+                <div class="stat-details">
                     <p>Total Tasks</p>
                     <h2 id="totalTasks">0</h2>
-                    <span>↑ 25% from last month</span>
+
+                    <span id="completionRate">
+                        0% completed
+                    </span>
                 </div>
+
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-green">OP</div>
-                <div>
+
+                <div class="stat-icon icon-green">
+                    OP
+                </div>
+
+                <div class="stat-details">
                     <p>Open Tasks</p>
                     <h2 id="openTasks">0</h2>
-                    <span>↑ 15% from last month</span>
+
+                    <span id="openDescription">
+                        No open tasks
+                    </span>
                 </div>
+
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-orange">PT</div>
-                <div>
+
+                <div class="stat-icon icon-orange">
+                    PT
+                </div>
+
+                <div class="stat-details">
                     <p>In Progress Tasks</p>
                     <h2 id="progressTasks">0</h2>
-                    <span>↑ 5% from last month</span>
+
+                    <span id="progressDescription">
+                        No tasks in progress
+                    </span>
                 </div>
+
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-purple">CT</div>
-                <div>
+
+                <div class="stat-icon icon-purple">
+                    CT
+                </div>
+
+                <div class="stat-details">
                     <p>Completed Tasks</p>
                     <h2 id="completedTasks">0</h2>
-                    <span>↑ 20% from last month</span>
+
+                    <span id="completedDescription">
+                        No completed tasks
+                    </span>
                 </div>
+
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-red">OD</div>
-                <div>
+
+                <div class="stat-icon icon-red">
+                    OD
+                </div>
+
+                <div class="stat-details">
                     <p>Overdue Tasks</p>
                     <h2 id="overdueTasks">0</h2>
-                    <span>↑ 0% from last month</span>
+
+                    <span id="overdueDescription">
+                        No overdue tasks
+                    </span>
                 </div>
+
             </div>
 
         </section>
 
+        <!-- CHARTS -->
         <section class="charts-grid">
 
             <div class="panel chart-panel">
-                <h3>Tasks Overview</h3>
-                <canvas id="taskChart"></canvas>
+
+                <div class="panel-title">
+                    <div>
+                        <h3>Tasks Overview</h3>
+                        <p>Current task distribution</p>
+                    </div>
+                </div>
+
+                <div class="bar-chart-wrapper">
+                    <canvas id="taskChart"></canvas>
+                </div>
+
             </div>
 
             <div class="panel chart-panel status-panel">
-                <h3>Tasks by Status</h3>
 
-                <div class="status-content">
-                    <canvas id="statusChart"></canvas>
-
-                    <div class="legend">
-                        <p><span class="dot green-dot"></span> Open <b id="legendOpen">0</b></p>
-                        <p><span class="dot orange-dot"></span> In Progress <b id="legendProgress">0</b></p>
-                        <p><span class="dot violet-dot"></span> Completed <b id="legendCompleted">0</b></p>
-                        <p><span class="dot red-dot"></span> Overdue <b id="legendOverdue">0</b></p>
+                <div class="panel-title">
+                    <div>
+                        <h3>Tasks by Status</h3>
+                        <p>Current project workload</p>
                     </div>
                 </div>
+
+                <div class="status-content">
+
+                    <div class="doughnut-wrapper">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <div class="legend">
+
+                        <p>
+                            <span class="dot green-dot"></span>
+                            Open
+                            <b id="legendOpen">0</b>
+                        </p>
+
+                        <p>
+                            <span class="dot orange-dot"></span>
+                            In Progress
+                            <b id="legendProgress">0</b>
+                        </p>
+
+                        <p>
+                            <span class="dot violet-dot"></span>
+                            Completed
+                            <b id="legendCompleted">0</b>
+                        </p>
+
+                        <p>
+                            <span class="dot red-dot"></span>
+                            Overdue
+                            <b id="legendOverdue">0</b>
+                        </p>
+
+                    </div>
+
+                </div>
+
             </div>
 
         </section>
 
+        <!-- ACTIVITY AND PROJECTS -->
         <section class="lists-grid">
 
             <div class="panel list-panel">
 
                 <div class="panel-header">
+                    <h3>Recent Activity</h3>
+                </div>
+
+                <div
+                    id="activityList"
+                    class="activity-list"
+                ></div>
+
+            </div>
+
+            <div class="panel list-panel">
+
+                <div class="panel-header">
+
                     <h3>Recent Projects</h3>
-                    <a href="project/project.html">View all <i class="fa-solid fa-arrow-right"></i></a>
+
+                    <a href="project/project.html">
+                        View all
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
                 </div>
 
                 <div id="recentProjectsList"></div>
 
             </div>
 
-            <div class="panel list-panel">
+        </section>
 
-                <div class="panel-header">
-                    <h3>Upcoming Tasks</h3>
-                    <a href="task/task.html">View all <i class="fa-solid fa-arrow-right"></i></a>
-                </div>
+        <!-- UPCOMING TASKS -->
+        <section class="panel list-panel upcoming-panel">
 
-                <div id="upcomingTasksList"></div>
+            <div class="panel-header">
+
+                <h3>Upcoming Tasks</h3>
+
+                <a href="task/task.html">
+                    View all
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
 
             </div>
 
+            <div id="upcomingTasksList"></div>
+
         </section>
 
+        <!-- CALENDAR -->
         <section class="panel calendar-card">
 
             <div class="calendar-header">
-                <button onclick="prevMonth()">
+
+                <button
+                    type="button"
+                    onclick="prevMonth()"
+                    aria-label="Previous month"
+                >
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
 
                 <h3>Calendar</h3>
+
                 <h4 id="monthYear"></h4>
 
-                <button onclick="nextMonth()">
+                <button
+                    type="button"
+                    onclick="nextMonth()"
+                    aria-label="Next month"
+                >
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
+
             </div>
 
             <div class="calendar">
-                <div id="calendarDays" class="days"></div>
+
+                <div
+                    id="calendarDays"
+                    class="days"
+                ></div>
+
+            </div>
+
+            <div class="calendar-legend">
+
+                <span>
+                    <i class="calendar-dot dot-open"></i>
+                    Open
+                </span>
+
+                <span>
+                    <i class="calendar-dot dot-progress"></i>
+                    In Progress
+                </span>
+
+                <span>
+                    <i class="calendar-dot dot-completed"></i>
+                    Completed
+                </span>
+
+                <span>
+                    <i class="calendar-dot dot-overdue"></i>
+                    Overdue
+                </span>
+
             </div>
 
         </section>
 
+        <footer class="dashboard-footer">
+            <p>Mini Jira © 2026 · Developed by Jayasree Kandhi</p>
+        </footer>
+
     </main>
 
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script src="dashboard.js"></script>
 

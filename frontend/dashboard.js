@@ -741,16 +741,33 @@ function formatDueDate(dateValue){
 function loadActivities(){
 
     const container =
-        document.getElementById("activityList");
+    document.getElementById("activityList");
 
     if(!container){
         return;
     }
 
+    if(!userId){
+
+        container.innerHTML = `
+            <p class="empty-text">
+                User ID is missing
+            </p>
+        `;
+
+        return;
+    }
+
     const activities =
-        JSON.parse(
-            localStorage.getItem(activityStorageKey)
-        ) || [];
+    JSON.parse(
+        localStorage.getItem(activityStorageKey)
+    ) || [];
+
+    console.log(
+        "Loading activities from:",
+        activityStorageKey,
+        activities
+    );
 
     container.innerHTML = "";
 

@@ -32,20 +32,30 @@ function addNotification(message){
 }
 function addActivity(message){
 
+    if(!userId){
+        console.log("User ID is missing");
+        return;
+    }
+
     let activities =
-        JSON.parse(
-            localStorage.getItem(activityStorageKey)
-        ) || [];
+    JSON.parse(
+        localStorage.getItem(activityStorageKey)
+    ) || [];
 
     activities.unshift({
         message: message,
-        time: new Date().toLocaleString(),
-        userId: userId
+        time: new Date().toLocaleString()
     });
 
     localStorage.setItem(
         activityStorageKey,
         JSON.stringify(activities)
+    );
+
+    console.log(
+        "Activity saved:",
+        activityStorageKey,
+        activities
     );
 }
 /* MODAL */
@@ -288,11 +298,9 @@ function showProjectError(message){
             );
 
             if(response.ok){
+    addActivity(`Project Updated: ${projectName}`);
 
-                addNotification(
-                    "Project Updated : " + projectName,
-                    endDate
-                );
+    addNotification(`Project Updated: ${projectName}`);
 showToast("Project Updated Successfully");
             }
 
@@ -314,10 +322,9 @@ showToast("Project Updated Successfully");
 
             if(response.ok){
 
-                addNotification(
-                    "New Project Created : " + projectName,
-                    endDate
-                );
+                addActivity(`Project Created: ${projectName}`);
+
+                addNotification(`Project Created: ${projectName}`);
 
                showToast("Project created Successfully");
             }
@@ -420,10 +427,10 @@ function deleteProject(id){
 
                     showToast("Project Deleted Successfully");
 
-                    addNotification(
-                        "Project Deleted",
-                        new Date().toLocaleDateString()
-                    );
+                     addActivity(`Project Deleted: ${projectName}`);
+
+    addNotification(`Project Deleted: ${projectName}`);
+                    
 
                     loadProjects();
 
@@ -466,6 +473,9 @@ function archiveProject(id){
             );
 
             if(response.ok){
+                  addActivity(`Project Archived: ${projectName}`);
+
+    addNotification(`Project Archived: ${projectName}`);
                 showToast("Project Archived Successfully");
                 loadProjects();
             }
@@ -507,10 +517,10 @@ function unarchiveProject(id){
 
                     showToast("Project Restored Successfully");
 
-                    addNotification(
-                        "Project Restored",
-                        new Date().toLocaleDateString()
-                    );
+                    addActivity(`Project Restored: ${projectName}`);
+
+    addNotification(`Project Restored: ${projectName}`);
+                    
 
                     loadProjects();
 

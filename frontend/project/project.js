@@ -1,6 +1,7 @@
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
-
+const notificationStorageKey = `notifications_${userId}`;
+const activityStorageKey = `activities_${userId}`;
 if(!token || !userId){
     alert("Please Login First");
     window.location.href = "../login.html";
@@ -11,23 +12,42 @@ const API =
 
 /* NOTIFICATIONS */
 
-function addNotification(title, date){
+function addNotification(message){
 
     let notifications =
-    JSON.parse(localStorage.getItem("notifications")) || [];
+        JSON.parse(
+            localStorage.getItem(notificationStorageKey)
+        ) || [];
 
     notifications.unshift({
-        title:title,
-        date:date || "",
-        createdAt:new Date().toLocaleString()
+        message: message,
+        time: new Date().toLocaleString(),
+        userId: userId
     });
 
     localStorage.setItem(
-        "notifications",
+        notificationStorageKey,
         JSON.stringify(notifications)
     );
 }
+function addActivity(message){
 
+    let activities =
+        JSON.parse(
+            localStorage.getItem(activityStorageKey)
+        ) || [];
+
+    activities.unshift({
+        message: message,
+        time: new Date().toLocaleString(),
+        userId: userId
+    });
+
+    localStorage.setItem(
+        activityStorageKey,
+        JSON.stringify(activities)
+    );
+}
 /* MODAL */
 
 function openProjectModal(){

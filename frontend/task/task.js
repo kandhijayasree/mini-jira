@@ -1,6 +1,7 @@
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
-
+const notificationStorageKey = `notifications_${userId}`;
+const activityStorageKey = `activities_${userId}`;
 if(!token || !userId){
     window.location.href = "../login.html";
 }
@@ -15,37 +16,43 @@ if(selectedProject){
 
 /* NOTIFICATIONS */
 
-function addNotification(title, date){
+function addNotification(message){
 
     let notifications =
-    JSON.parse(localStorage.getItem("notifications")) || [];
+        JSON.parse(
+            localStorage.getItem(notificationStorageKey)
+        ) || [];
 
     notifications.unshift({
-        title:title,
-        date:date || "",
-        createdAt:new Date().toLocaleString()
+        message: message,
+        time: new Date().toLocaleString(),
+        userId: userId
     });
 
-    localStorage.setItem("notifications", JSON.stringify(notifications));
+    localStorage.setItem(
+        notificationStorageKey,
+        JSON.stringify(notifications)
+    );
 }
 
 /* ACTIVITY */
-
 function addActivity(message){
 
     let activities =
-    JSON.parse(localStorage.getItem("activities")) || [];
+        JSON.parse(
+            localStorage.getItem(activityStorageKey)
+        ) || [];
 
     activities.unshift({
-        message:message,
-        time:new Date().toLocaleString()
+        message: message,
+        time: new Date().toLocaleString(),
+        userId: userId
     });
 
-    if(activities.length > 30){
-        activities = activities.slice(0,30);
-    }
-
-    localStorage.setItem("activities", JSON.stringify(activities));
+    localStorage.setItem(
+        activityStorageKey,
+        JSON.stringify(activities)
+    );
 }
 
 /* TOAST */
@@ -297,12 +304,13 @@ async function saveTask(){
 
             if(response.ok){
 
-                addNotification(
-                    "Task Updated : " + taskName,
-                    taskData.dueDate
-                );
+              addNotification(
+    `Task created: ${taskName}`
+);
 
-                addActivity("✏️ Task Updated : " + taskName);
+addActivity(
+    `Task created: ${taskName}`
+);
 
                 showToast("Task Updated Successfully", "success");
 

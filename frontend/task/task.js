@@ -38,20 +38,30 @@ function addNotification(message){
 /* ACTIVITY */
 function addActivity(message){
 
+    if(!userId){
+        console.log("User ID is missing");
+        return;
+    }
+
     let activities =
-        JSON.parse(
-            localStorage.getItem(activityStorageKey)
-        ) || [];
+    JSON.parse(
+        localStorage.getItem(activityStorageKey)
+    ) || [];
 
     activities.unshift({
         message: message,
-        time: new Date().toLocaleString(),
-        userId: userId
+        time: new Date().toLocaleString()
     });
 
     localStorage.setItem(
         activityStorageKey,
         JSON.stringify(activities)
+    );
+
+    console.log(
+        "Activity saved:",
+        activityStorageKey,
+        activities
     );
 }
 
@@ -301,16 +311,12 @@ async function saveTask(){
                     body:JSON.stringify(taskData)
                 }
             );
+if(response.ok){
 
-            if(response.ok){
+    addActivity(`Task Updated: ${taskName}`);
 
-              addNotification(
-    `Task created: ${taskName}`
-);
+    addNotification(`Task Updated: ${taskName}`);
 
-addActivity(
-    `Task created: ${taskName}`
-);
 
                 showToast("Task Updated Successfully", "success");
 
@@ -339,12 +345,12 @@ addActivity(
 
             if(response.ok){
 
-                addNotification(
-                    "New Task Added : " + taskName,
-                    taskData.dueDate
-                );
+                addActivity(`Task Created: ${taskName}`);
 
-                addActivity("✅ Task Created : " + taskName);
+    addNotification(`Task Created: ${taskName}`);
+                
+
+              
 
                 showToast("Task Added Successfully", "success");
 
@@ -421,14 +427,15 @@ function deleteTask(id, taskName){
                 }
             );
 
-            if(response.ok){
+           if(response.ok){
 
-                addNotification(
-                    "Task Deleted : " + (taskName || "Task"),
-                    new Date().toLocaleDateString()
-                );
+    addActivity(`Task Deleted: ${taskName}`);
 
-                addActivity("🗑️ Task Deleted : " + (taskName || "Task"));
+    addNotification(`Task Deleted: ${taskName}`);
+
+
+
+                
 
                 showToast("Task Deleted Successfully", "success");
 

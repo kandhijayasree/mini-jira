@@ -1,5 +1,4 @@
-const API = "http://localhost:3000";
-
+const API = "https://mini-jira-backend-mqxd.onrender.com";
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
 const notificationStorageKey = `notifications_${userId}`;
@@ -1319,5 +1318,3 @@ async function initializeDashboard(){
         loadUpcomingTasks()
     ]);
 }
-
-initializeDashboard();

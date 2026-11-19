@@ -15,17 +15,19 @@ async function login(event){
 
     try{
 
-        const response =
-        await fetch("http://localhost:3000/login",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                email,
-                password
-            })
-        });
+        const response = await fetch(
+    "https://mini-jira-backend-mqxd.onrender.com/login",
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email,
+            password
+        })
+    }
+);
 
         const data =
         await response.json();
@@ -93,7 +95,7 @@ function togglePassword(){
 
         password.type = "text";
 
-        
+        eye.classList.remove("fa-eye");
 
     }
     else{

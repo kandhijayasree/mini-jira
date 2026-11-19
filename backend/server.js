@@ -188,34 +188,39 @@ app.post("/login",async(req,res)=>{
         });
     }
 });
-
 /* FORGOT PASSWORD */
 
-app.put("/forgot-password",async(req,res)=>{
+app.put("/forgot-password", async (req, res) => {
+    try {
+        const email = String(req.body.email || "").trim().toLowerCase();
+        const newPassword = req.body.newPassword;
 
-    try{
-        const { email,newPassword } = req.body;
+        if (!email || !newPassword || newPassword.length < 8) {
+            return res.status(400).json({
+                message: "Enter a valid email and password of at least 8 characters"
+            });
+        }
 
         const user = await User.findOne({ email });
 
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                message:"User not found"
+                message: "User not found"
             });
         }
 
         user.password = await bcrypt.hash(newPassword, 10);
-
         await user.save();
 
         res.json({
-            success:true,
-            message:"Password Updated Successfully"
+            success: true,
+            message: "Password updated successfully"
         });
-    }
-    catch(error){
+
+    } catch (error) {
+        console.error("Reset password error:", error);
         res.status(500).json({
-            message:error.message
+            message: "Server error"
         });
     }
 });

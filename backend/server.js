@@ -201,9 +201,14 @@ app.put("/forgot-password", async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({
+            email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" }
+        });
 
         if (!user) {
+            console.log("Reset user not found:", email);
+            console.log("Database:", User.db.name);
+
             return res.status(404).json({
                 message: "User not found"
             });
@@ -224,7 +229,6 @@ app.put("/forgot-password", async (req, res) => {
         });
     }
 });
-
 app.put("/users/:id/change-password", async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
